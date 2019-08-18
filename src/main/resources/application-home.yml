@@ -1,0 +1,19 @@
+spring:
+    datasource:
+        url: jdbc:mariadb://192.168.219.131:3306/wslt?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
+        driver-class-name: org.mariadb.jdbc.Driver
+        username: devtaek
+        password:
+
+
+
+
+
+
+
+
+
+
+
+
+

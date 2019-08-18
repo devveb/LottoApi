@@ -1,0 +1,27 @@
+server:
+    port: 28081
+    tomcat:
+        uri-encoding: UTF-8
+
+spring:
+    profiles:
+        active: home
+
+mybatis:
+    mapper-locations: classpath*:sqlmapper/*.xml
+    type-aliases-package: com.sbsft.wslapi.domain
+    configuration:
+        map-underscore-to-camel-case: true
+        default-fetch-size: 20
+        default-statement-timeout: 30
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sbsft.wslapi.mapper.ApiMapper">
+	<insert id="insertToWordList" parameterType="String">
+        insert into word_combi_list(word,showYN) values (#{word},1)
+    </insert>
+
+    <select id="selectRecentList" resultType="Map">
+        select * from word_combi_list
+        where showYN = 1
+        order by regdate desc
+        limit 5;
+    </select>
+</mapper>
