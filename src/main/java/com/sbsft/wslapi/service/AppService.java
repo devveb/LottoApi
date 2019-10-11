@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 @Service
 public class AppService {
+
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ApiMapper apiMapper;
     @Autowired
@@ -35,6 +38,21 @@ public class AppService {
     public List<Map<String,Object>> list() {
         //get recent word list (order by date desc, limit 5)
         return apiMapper.selectRecentList();
+    }
+
+    public String getWinNumbers(String story, int iss) {
+
+        String result = apiMapper.selectDreamNumber(dtnUtil.textCheck(story));
+        Map map = new HashMap();
+        map.put("story",story);
+        map.put("result",result);
+        map.put("iss",iss);
+        apiMapper.insertDreamResult(map);
+        return result;
+    }
+
+    public List<Map<String, Object>> dlist() {
+        return apiMapper.selectDreamResultList();
     }
 }
 

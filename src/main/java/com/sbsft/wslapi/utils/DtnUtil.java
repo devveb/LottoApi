@@ -1,6 +1,5 @@
 package com.sbsft.wslapi.utils;
 
-import com.sbsft.wslapi.domain.NumberSet;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -41,8 +40,8 @@ public class DtnUtil {
 
     }
 
-    public String textCheck(NumberSet dream) {
-        return dream.getStory().replaceAll("\n", " ").replaceAll("(?m)^[ \t]*\r?\n", " ").replaceAll("\\s+",
+    public String textCheck(String story) {
+        return story.replaceAll("\n", " ").replaceAll("(?m)^[ \t]*\r?\n", " ").replaceAll("\\s+",
                 " ").replaceAll("[가|을|를|이|들|은|에|와|과|까|고|서|는|서]\\s", " ");
     }
 }

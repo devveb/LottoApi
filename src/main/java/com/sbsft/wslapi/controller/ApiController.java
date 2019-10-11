@@ -1,13 +1,10 @@
 package com.sbsft.wslapi.controller;
 
-import com.sbsft.wslapi.domain.NumberSet;
 import com.sbsft.wslapi.service.AppService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +24,7 @@ public class ApiController {
     @PostMapping("/save")
     @ResponseBody
     public int save(HttpServletRequest req) {
+
         return appService.save(req);
     }
 
@@ -36,4 +34,24 @@ public class ApiController {
     public List<Map<String,Object>> list() {
         return appService.list();
     }
+
+    @CrossOrigin
+    @PostMapping("/wtn")
+    @ResponseBody
+    public String storyToNum(@RequestParam String story,@RequestParam int iss) {
+        return appService.getWinNumbers(story,iss);
+    }
+
+    /**
+     * Dream to Number result list
+     * @return
+     */
+    @CrossOrigin
+    @GetMapping("/dlist")
+    @ResponseBody
+    public List<Map<String,Object>> dlist() {
+        return appService.dlist();
+    }
+
+
 }

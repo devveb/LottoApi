@@ -11,4 +11,10 @@ public interface ApiMapper {
     void insertToWordList(String word);
 
     List<Map<String, Object>> selectRecentList();
+
+    String selectDreamNumber(String story);
+
+    void insertDreamResult(Map map);
+
+    List<Map<String, Object>> selectDreamResultList();
 }

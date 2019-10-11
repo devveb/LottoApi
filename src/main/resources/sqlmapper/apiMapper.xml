@@ -11,4 +11,38 @@
         order by regdate desc
         limit 5;
     </select>
+
+    <select id="selectDreamNumber" resultType="String" parameterType="String">
+    select GROUP_CONCAT(num) from (
+        select num,sum(count) as sc from (
+            SELECT
+            word,
+            num,
+            ROUND (
+            (
+            LENGTH(#{story})
+            - LENGTH( REPLACE ( #{story},word, "") )
+            ) / LENGTH(word)
+            ) AS count
+            FROM word_num_map_list
+            group by word
+        ) tmp
+    group by num
+    order by sc desc
+    limit 6
+    ) tmp2
+    </select>
+
+    <insert id="insertDreamResult" parameterType="Map">
+        insert into word_dream_list(story,result,isShow) VALUES (#{story},#{result},#{iss})
+    </insert>
+
+    <select id="selectDreamResultList" resultType="Map">
+        select result,date_format(regd,'%Y-%m-%d %H:%m') as regd
+        from word_dream_list
+        where isShow =1
+        limit 5
+    </select>
+
+
 </mapper>
