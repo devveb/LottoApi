@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 public class AppService {
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+
     @Autowired
     private ApiMapper apiMapper;
     @Autowired
@@ -43,7 +43,8 @@ public class AppService {
     public String getWinNumbers(String story, int iss) {
 
         String result = apiMapper.selectDreamNumber(dtnUtil.textCheck(story));
-        Map map = new HashMap();
+        Map map;
+        map = new HashMap<String,Object>();
         map.put("story",story);
         map.put("result",result);
         map.put("iss",iss);
