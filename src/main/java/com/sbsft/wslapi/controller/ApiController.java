@@ -24,7 +24,7 @@ public class ApiController {
     @PostMapping("/save")
     @ResponseBody
     public int save(HttpServletRequest req) {
-
+        //save word slot combination
         return appService.save(req);
     }
 
@@ -32,26 +32,11 @@ public class ApiController {
     @GetMapping("/list")
     @ResponseBody
     public List<Map<String,Object>> list() {
+        // recent list of words
         return appService.list();
     }
 
-    @CrossOrigin
-    @PostMapping("/wtn")
-    @ResponseBody
-    public String storyToNum(@RequestParam String story,@RequestParam int iss) {
-        return appService.getWinNumbers(story,iss);
-    }
 
-    /**
-     * Dream to Number result list
-     * @return
-     */
-    @CrossOrigin
-    @GetMapping("/dlist")
-    @ResponseBody
-    public List<Map<String,Object>> dlist() {
-        return appService.dlist();
-    }
 
 
 }

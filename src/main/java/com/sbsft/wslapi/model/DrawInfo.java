@@ -24,6 +24,7 @@ public class DrawInfo {
     private String fourthPrize;
     private String fifthPrize;
 
+    private int place;
     private String pickDate;
 
 }

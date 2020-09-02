@@ -5,4 +5,114 @@
 
     </insert>
 
+    <select id="getMaxDraw" resultType="int">
+        select ifnull(max(draw),0) as draw from lotto_draw_history
+    </select>
+
+    <insert id="insertDrawHistory" parameterType="NumSet">
+        INSERT INTO lotto_draw_history
+        (draw,
+         first,
+         second,
+         third,
+         fourth,
+         fifth,
+         sixth,
+         bonus,
+         first_prize,
+         second_prize,
+         third_prize,
+         fourth_prize,
+         draw_date)
+        VALUES     (
+                #{draw},
+                #{first},
+                #{second},
+                #{third},
+                #{fourth},
+                #{fifth},
+                #{sixth},
+                #{bonus},
+                #{firstPrize},
+                #{secondPrize},
+                #{thirdPrize},
+                #{fourthPrize},
+                #{drawDate})
+    </insert>
+
+    <insert id="insertDreamResult" parameterType="DreamStory" useGeneratedKeys="true" keyProperty="idx" keyColumn="idx">
+        insert into word_dream_list(story,result,isShow) VALUES (#{story},#{result},#{iss})
+
+    </insert>
+
+    <select id="selectDreamResultList" resultType="DreamStory" parameterType="int">
+
+        select
+          idx
+        ,result
+        , regd
+        , story
+        <![CDATA[
+            ,CASE
+            WHEN td < 60 THEN 'now'
+            WHEN td >= 60 and td <=3600 THEN  concat(round(td/60),'min')
+            WHEN td >= 3600 and td <=86400 THEN concat(round(td/3600),'hour')
+            WHEN td >= 86400 and td <=604800 THEN concat(round(td/86400),'day')
+            WHEN td >= 604800 and td <=2419200 THEN concat(round(td/604800),'week')
+            WHEN td >= 2419200 THEN concat(round(td/2419200),'months')
+            END as timer
+            ]]>
+        from (
+        select
+          idx
+        ,result
+        ,story
+        , date_format(regd, '%Y-%m-%d %H:%i') as regd
+        , TIMESTAMPDIFF(SECOND, regd, now())  as td
+        from
+        word_dream_list
+        where isShow = 1
+        order by idx desc
+        <if test="_parameter > 0">
+            limit ${_parameter}
+        </if>
+        ) tmp
+
+    </select>
+
+    <select id="selectDreamNumber" resultType="String" parameterType="String">
+        select GROUP_CONCAT(num) from (
+                                          select num,sum(count) as sc from (
+                                                                               SELECT
+                                                                                   word,
+                                                                                   num,
+                                                                                   ROUND (
+                                                                                               (
+                                                                                                       LENGTH(#{story})
+                                                                                                       - LENGTH( REPLACE ( #{story},word, "") )
+                                                                                                   ) / LENGTH(word)
+                                                                                       ) AS count
+                                                                               FROM word_num_map_list
+                                                                               group by word
+                                                                           ) tmp
+                                          group by num
+                                          order by sc desc
+                                          limit 6
+                                      ) tmp2
+    </select>
+
+    <select id="getDrawHistory" resultType="NumSet">
+        select draw,first,second,third,fourth,fifth,sixth,bonus,draw_date from lotto_draw_history
+    </select>
+
+    <insert id="insertDrawSimulation" parameterType="NumSet">
+        insert into lotto_draw_simmulation(nid,draw,place) values (#{idx},#{draw},#{place})
+    </insert>
+
+    <select id="seleteUnpackedSuggestionList" resultType="DreamStory">
+        select * from word_dream_list
+        where idx not in (select distinct nid from lotto_draw_simmulation)
+          and isShow = 1
+    </select>
+
 </mapper>

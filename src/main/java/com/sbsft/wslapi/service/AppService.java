@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,21 +39,7 @@ public class AppService {
         return apiMapper.selectRecentList();
     }
 
-    public String getWinNumbers(String story, int iss) {
 
-        String result = apiMapper.selectDreamNumber(dtnUtil.textCheck(story));
-        Map map;
-        map = new HashMap<String,Object>();
-        map.put("story",story);
-        map.put("result",result);
-        map.put("iss",iss);
-        apiMapper.insertDreamResult(map);
-        return result;
-    }
-
-    public List<Map<String, Object>> dlist() {
-        return apiMapper.selectDreamResultList();
-    }
 }
 
 

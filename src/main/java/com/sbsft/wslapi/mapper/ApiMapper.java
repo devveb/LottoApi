@@ -12,9 +12,4 @@ public interface ApiMapper {
 
     List<Map<String, Object>> selectRecentList();
 
-    String selectDreamNumber(String story);
-
-    void insertDreamResult(Map map);
-
-    List<Map<String, Object>> selectDreamResultList();
 }
