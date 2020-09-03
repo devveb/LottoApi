@@ -27,4 +27,16 @@ public interface LotteryMapper {
     void insertDrawSimulation(NumSet dreamnum);
 
     List<DreamStory> seleteUnpackedSuggestionList();
+
+    void insertNumberCombiTotalPrize(NumSet ns);
+
+    int countNumberSet(DreamStory ds);
+
+    void insertNumberSet(DreamStory ds);
+
+    void updateSuggestionCount(DreamStory ds);
+
+    NumSet getNumberSet(DreamStory ds);
+
+    void updateNumberCombiTotalPrize(NumSet ns);
 }

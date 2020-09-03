@@ -10,6 +10,7 @@ public class DreamStory extends DrawInfo {
     private int iss;
     private String result;
     private String timer;
+    private int snid;
 
 
 }

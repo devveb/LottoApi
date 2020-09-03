@@ -30,8 +30,8 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/rl")
     @ResponseBody
-    public List<DreamStory> recentList(@RequestParam int p) {
-        return lotteryService.dlist(p);
+    public List<DreamStory> recentList(@RequestParam("p") int page) {
+        return lotteryService.dlist(page);
     }
 
 

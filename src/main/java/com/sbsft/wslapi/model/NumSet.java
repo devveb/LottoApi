@@ -15,4 +15,5 @@ public class NumSet extends DrawInfo {
     private String bonus;
     private String rip;
     private String drawDate;
+    private int totalPrize;
 }

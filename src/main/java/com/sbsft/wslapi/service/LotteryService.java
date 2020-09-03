@@ -33,14 +33,20 @@ public class LotteryService {
 
         String result = lotteryMapper.selectDreamNumber(dtnUtil.textCheck(story));
 
-
-        //map.put("story",story);
         ds.setStory(story);
-       // map.put("result",result);
         ds.setResult(result);
-        //map.put("iss",iss);
         ds.setIss(iss);
-        //map.put("history",checkHistory(map));
+
+        int numsetCnt = lotteryMapper.countNumberSet(ds);
+
+        if(numsetCnt < 1){
+            lotteryMapper.insertNumberSet(ds);
+        }else{
+            lotteryMapper.updateSuggestionCount(ds);
+        }
+
+        NumSet ns = lotteryMapper.getNumberSet(ds);
+        ds.setSnid(ns.getIdx());
         lotteryMapper.insertDreamResult(ds);
         checkHistory(ds);
         return result;
@@ -48,6 +54,8 @@ public class LotteryService {
 
     private List<String> checkHistory(DreamStory ds) {
         NumSet dreamnum = new NumSet();
+        int totalPrize = 0;
+
         List<String> resultStrs = new ArrayList<>();
         String result = ds.getResult();
         String[] arr = result.split(",");
@@ -64,12 +72,25 @@ public class LotteryService {
         for(NumSet historyNum:historyNums){
             int place = winChecker(historyNum,dreamnum);
             if( place <= 3) {
+                if(place == 1){
+                    totalPrize+=Integer.parseInt(historyNum.getFirstPrize());
+                }else if(place == 2){
+                    totalPrize+=Integer.parseInt(historyNum.getSecondPrize());
+                }else{
+                    totalPrize+=Integer.parseInt(historyNum.getThirdPrize());
+                }
 
                 dreamnum.setPlace(place);
                 dreamnum.setDraw(historyNum.getDraw());
                 lotteryMapper.insertDrawSimulation(dreamnum);
             }
         }
+        NumSet ns = new NumSet();
+        //ns.setIdx(dreamnum.getIdx());
+        ns.setIdx(ds.getSnid());
+        ns.setTotalPrize(totalPrize);
+        //lotteryMapper.insertNumberCombiTotalPrize(ns);
+        lotteryMapper.updateNumberCombiTotalPrize(ns);
 
         return resultStrs;
     }
