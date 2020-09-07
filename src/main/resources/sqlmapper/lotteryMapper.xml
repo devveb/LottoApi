@@ -51,20 +51,22 @@
           idx
         ,result
         , regd
-        , story
+        , <![CDATA[replace(story,'<','&lt;') as story ]]>
+        , snid
         <![CDATA[
             ,CASE
             WHEN td < 60 THEN 'now'
-            WHEN td >= 60 and td <=3600 THEN  concat(round(td/60),'min')
-            WHEN td >= 3600 and td <=86400 THEN concat(round(td/3600),'hour')
-            WHEN td >= 86400 and td <=604800 THEN concat(round(td/86400),'day')
-            WHEN td >= 604800 and td <=2419200 THEN concat(round(td/604800),'week')
-            WHEN td >= 2419200 THEN concat(round(td/2419200),'months')
+            WHEN td >= 60 and td <=3600 THEN  concat(round(td/60),' min')
+            WHEN td >= 3600 and td <=86400 THEN concat(round(td/3600),' hour')
+            WHEN td >= 86400 and td <=604800 THEN concat(round(td/86400),' day')
+            WHEN td >= 604800 and td <=2419200 THEN concat(round(td/604800),' week')
+            WHEN td >= 2419200 THEN concat(round(td/2419200),' month')
             END as timer
             ]]>
         from (
             select
                 sug.idx
+                ,sug.snid
                 ,num.number_set as result
                 ,story
                 , date_format(regd, '%Y-%m-%d %H:%i') as regd
@@ -103,17 +105,38 @@
     </select>
 
     <select id="getDrawHistory" resultType="NumSet">
-        select draw,first,second,third,fourth,fifth,sixth,bonus,draw_date from wslt.lotto_draw_history
+        select draw,first,second,third,fourth,fifth,sixth,bonus,first_prize as firstPrize,second_prize as secondPrize, third_prize as thirdPrize ,draw_date from wslt.lotto_draw_history
     </select>
 
     <insert id="insertDrawSimulation" parameterType="NumSet">
-        insert into wslt.lotto_draw_simmulation(nid,draw,place) values (#{idx},#{draw},#{place})
+        insert into wslt.lotto_draw_simmulation(nid,draw,place,sug_date,draw_date) values (#{idx},#{draw},#{place},#{sugDate},#{drawDate})
     </insert>
 
     <select id="seleteUnpackedSuggestionList" resultType="DreamStory">
-        select * from wslt.lotto_suggestions
-        where idx not in (select distinct nid from wslt.lotto_draw_simmulation)
-          and isShow = 1
+        select
+            idx
+             ,result
+             , regd as regDate
+             , story
+             , snid
+        from (
+                 select
+                     sug.idx
+                      ,sug.snid
+                      ,num.number_set as result
+                      ,story
+                      , date_format(regd, '%Y-%m-%d %H:%i') as regd
+                      , TIMESTAMPDIFF(SECOND, regd, now())  as td
+                 from
+                     wslt.lotto_suggestions sug
+                         left outer join
+                     wslt.lotto_suggestion_numset num
+                     on sug.snid = num.idx
+
+                 where sug.snid not in (select distinct nid from wslt.lotto_draw_simmulation)
+                   and isShow = 1
+
+             ) tmp
     </select>
 
     <insert id="insertNumberCombiTotalPrize" parameterType="NumSet">
@@ -135,7 +158,7 @@
     </update>
 
     <select id="getNumberSet" parameterType="DreamStory" resultType="NumSet">
-        select idx from wslt.lotto_suggestion_numset
+        select idx,lst_sug_date as sugDate from wslt.lotto_suggestion_numset
         where number_set = '${result}'
     </select>
 
@@ -145,5 +168,34 @@
         where idx = #{idx}
 
     </update>
+
+    <select id="getNumberSetById" parameterType="DreamStory" resultType="NumSet">
+        select
+            idx
+            ,number_set as numberUnit
+            ,sug_cnt as sugCount
+            ,total_prize as totalPrize
+            ,reg_date as regDate
+            ,lst_sug_date as sugDate
+        from
+            wslt.lotto_suggestion_numset
+        where
+            idx = #{snid}
+    </select>
+
+    <select id="getSimHistory" parameterType="DreamStory" resultType="DreamStory">
+        select
+            idx
+            ,nid as snid
+            ,draw
+            ,place
+            ,sug_date as sugDate
+            ,draw_date as drawDate
+            ,reg_date as regDate
+        from
+            wslt.lotto_draw_simmulation
+        where
+            nid = #{snid}
+    </select>
 
 </mapper>

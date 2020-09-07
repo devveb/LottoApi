@@ -12,12 +12,14 @@ public class DrawInfo {
     private String thirdTotalPrize;
     private String fourthTotalPrize;
     private String fifthTotalPrize;
+
     private int firstWinCnt;
     private int secondWinCnt;
     private int thirdWinCnt;
     private int fourthWinCnt;
     private int fifthWinCnt;
     private int sixthWinCnt;
+
     private String firstPrize;
     private String secondPrize;
     private String thirdPrize;
@@ -26,5 +28,10 @@ public class DrawInfo {
 
     private int place;
     private String pickDate;
+    private String drawDate;
+    private String sugDate;
+    private String regDate;
+
+    private int sugCount;
 
 }

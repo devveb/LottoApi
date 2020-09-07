@@ -34,5 +34,28 @@ public class LotteryApiController {
         return lotteryService.dlist(page);
     }
 
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/lm")
+    @ResponseBody
+    public String recentListAndModal(@RequestParam("p") int page) {
+        return lotteryService.getListAndModal(page);
+    }
+
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/nd")
+    @ResponseBody
+    public String getSuggestionNumberDetail(@RequestParam("snid") int snid) {
+        return lotteryService.getSuggestionNumberDetailHtml(snid);
+    }
+
 
 }

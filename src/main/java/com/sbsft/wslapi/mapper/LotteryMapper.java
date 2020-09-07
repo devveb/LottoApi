@@ -39,4 +39,8 @@ public interface LotteryMapper {
     NumSet getNumberSet(DreamStory ds);
 
     void updateNumberCombiTotalPrize(NumSet ns);
+
+    NumSet getNumberSetById(DreamStory ds);
+
+    List<DreamStory> getSimHistory(DreamStory ds);
 }
