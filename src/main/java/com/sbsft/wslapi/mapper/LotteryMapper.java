@@ -43,4 +43,10 @@ public interface LotteryMapper {
     NumSet getNumberSetById(DreamStory ds);
 
     List<DreamStory> getSimHistory(DreamStory ds);
+
+    void postNumberSuggestionReply(DreamStory ds);
+
+    List<DreamStory> getSuggestionNumberReplyById(int snid);
+
+    DreamStory getSuggestionById(int snid);
 }

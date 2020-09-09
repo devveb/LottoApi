@@ -163,7 +163,7 @@ public class LotteryService {
                     "<span class=\"m-timeline-3__item-time\">" + ds.getTimer() + "</span>" + "<div class=\"m-timeline-3__item-desc\">"
                     + "<span class=\"m-timeline-3__item-text\">" + ds.getStory().replaceAll("<","&lt;").replaceAll(">","&gt;")+ "</span>" + "<br>"
                     + "<span class=\"m-timeline-3__item-user-name\">"
-                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#m_modal_"+String.valueOf(idx)+"\"  onclick=\"javascript:getModalInfo("+idx+","+ds.getSnid()+");\">" + ds.getResult() + "</a>"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#m_modal_"+String.valueOf(idx)+"\"  onclick=\"javascript:getModalInfo("+idx+","+ds.getIdx()+");\">" + ds.getResult() + "</a>"
                     + "</span>" + "</div>" + "</div>"
                     +makeModal(ds.getResult(),String.valueOf(idx));
                     idx++;
@@ -173,31 +173,28 @@ public class LotteryService {
 
     public String makeModal(String title,String id){
         return "<div class=\"modal fade\" id=\"m_modal_"+id+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" style=\"display: none;\" aria-hidden=\"true\">\n" +
-                "\t\t\t\t\t\t\t<div class=\"modal-dialog\" role=\"document\">\n" +
-                "\t\t\t\t\t\t\t\t<div class=\"modal-content\">\n" +
-                "\t\t\t\t\t\t\t\t\t<div class=\"modal-header\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<h5 class=\"modal-title\" id=\"exampleModalLabel\">\n" +
-                 title+
-                "\t\t\t\t\t\t\t\t\t\t</h5>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t<span aria-hidden=\"true\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t\t×\n" +
-                "\t\t\t\t\t\t\t\t\t\t\t</span>\n" +
-                "\t\t\t\t\t\t\t\t\t\t</button>\n" +
-                "\t\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t\t<div class=\"modal-body\">\n" +
-                "\t\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t\t<div class=\"modal-footer\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t\tClose\n" +
-                "\t\t\t\t\t\t\t\t\t\t</button>\n" +
-                "\t\t\t\t\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-primary\">\n" +
-                "\t\t\t\t\t\t\t\t\t\t\tSave changes\n" +
-                "\t\t\t\t\t\t\t\t\t\t</button>\n" +
-                "\t\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t\t</div>\n" +
-                "\t\t\t\t\t\t</div>";
+                "<div class=\"modal-dialog\" role=\"document\">\n" +
+                "<div class=\"modal-content\">\n" +
+                "<div class=\"modal-header\">\n" +
+                "<h5 class=\"modal-title\" id=\"exampleModalLabel\">\n" +
+                "토론방"+
+                "</h5>\n" +
+                "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
+                "<span aria-hidden=\"true\">\n" +
+                "×\n" +
+                "</span>\n" +
+                "</button>\n" +
+                "</div>\n" +
+                "<div class=\"modal-body\">\n" +
+                "</div>\n" +
+                "<div class=\"modal-footer\">\n" +
+                "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">\n" +
+                "Close\n" +
+                "</button>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
     }
 
 
@@ -311,32 +308,129 @@ public class LotteryService {
         return lotteryMapper.seleteUnpackedSuggestionList();
     }
 
+    public String getSuggestionNumberReplyById(int snid){
+        String html ="<div class=\"m-section\">\n" +
+                "<div class=\"m-section__content\">\n" +
+                "<!--begin::Preview-->\n" +
+                "<div class=\"m-demo\">\n" +
+                "<div class=\"m-demo__preview\">\n" +
+                "<div class=\"m-list-timeline\">\n";
+        List<DreamStory> replyList = lotteryMapper.getSuggestionNumberReplyById(snid);
+
+        if(replyList.size() > 0){
+            for(DreamStory ds : replyList){
+                html=html+"<div class=\"m-list-timeline__items\">\n" +
+                        "<div class=\"m-list-timeline__item\">\n" +
+                        "<span class=\"m-list-timeline__badge\"></span>\n" +
+                        "<span class=\"m-list-timeline__text\">\n" +
+                        ds.getStory()+
+                        "</span>\n" +
+                        "<span class=\"m-list-timeline__time\">\n" +
+                        ds.getTimer()+
+                        "</span>\n" +
+                        "</div>\n" +
+                        "</div>\n";
+
+            }
+        }else{
+            html=html+"<div class=\"m-list-timeline__items\">\n" +
+                    "<div class=\"m-list-timeline__item\">\n" +
+                    "<span class=\"m-list-timeline__badge\"></span>\n" +
+                    "<span class=\"m-list-timeline__text\">\n" +
+                    "no reply"+
+                    "</span>\n" +
+                    "</div>\n" +
+                    "</div>\n";
+        }
+        html=html+"</div>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "<!--end::Preview-->\n" +
+                "</div>\n" +
+                "</div>";
+        return html;
+    }
+
 
     public String getSuggestionNumberDetailHtml(int snid) {
-        DreamStory ds = new DreamStory();
-        ds.setSnid(snid);
+        DreamStory ds = lotteryMapper.getSuggestionById(snid);
+        //ds.setSnid(snid);
         NumSet ns = lotteryMapper.getNumberSetById(ds);
         List<DreamStory> history = lotteryMapper.getSimHistory(ds);
 
-        String html = "<h6>추천횟수: "+ns.getSugCount()+"</h6>";
+        String html = "";
+        html = html+"<div class=\"m-demo__preview\">\n" +
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\">\n" +
+                "<div class=\"m-stack__item m-stack__item--left\">\n" +
+                "<div class=\"m-stack__demo-item\">\n" +
+                ds.getStory()+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>"+
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center\">\n" +
+                "<div class=\"m-stack__demo-item\">\n" +
+                "<h6>추천번호</h6>"+ns.getNumberUnit()+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>"+
+
+                "<div class=\"m--space-10\"></div>\n" +
+                "<div class=\"m-stack m-stack--ver m-stack--tablet m-stack--demo\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--top\">\n" +
+                "<h6>추천횟수: "+ns.getSugCount()+"</h6>" +
+                "</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--middle\">\n";
+
+                if(history.size() > 0){
+                    html = html+"<div style=\"overflow:scroll;height:200px;\">";
+                    for(DreamStory dream : history){
+                        html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"</span><br></div></div>";
+                    }
+                    html=html+"</div>";
+                }else{
+                    html=html+"<h6>당첨내역 없음</h6>";
+                }
+
+                html=html+"</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--bottom\">\n" +
+                "<h6>총 획득상금: "+ns.getTotalPrize()+"</h6>" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
+
+                html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
+                        "<div class=\"input-group\">\n" +
+                        "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
+                        "<div class=\"input-group-append\">\n" +
+                        "<button class=\"btn btn-secondary\" type=\"button\" onclick=\"nrep("+ds.getSnid()+")\">\n" +
+                        "Go!\n" +
+                        "</button>\n" +
+                        "</div>\n" +
+                        "</div>\n" +
+                        "</div>";
+
+                        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getSuggestionNumberReplyById(ds.getSnid());
 
 
-
-        if(history.size() > 0){
-            html = html+"<div style=\"overflow:scroll;height:200px;\">";
-            for(DreamStory dream : history){
-                html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"</span><br></div></div>";
-            }
-            html=html+"</div>";
-        }else{
-            html=html+"<h6>당첨내역 없음</h6>";
-        }
-
-
-
-        html=html+"<h6>총 획득상금: "+ns.getTotalPrize()+"</h6>";
 
         return html;
+    }
+
+    public String postNumberSuggestionReply(int snid, String story) {
+        DreamStory ds = new DreamStory();
+        String code ="200";
+        try{
+            ds.setStory(story.replaceAll("<","&lt;"));
+            ds.setSnid(snid);
+
+            lotteryMapper.postNumberSuggestionReply(ds);
+        }catch (Exception e){
+            code="999";
+        }
+        return code;
+
+
     }
 }
 

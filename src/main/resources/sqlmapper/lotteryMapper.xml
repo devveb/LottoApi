@@ -198,4 +198,43 @@
             nid = #{snid}
     </select>
 
+    <insert id="postNumberSuggestionReply" parameterType="DreamStory">
+        insert into wslt.lotto_suggestion_reply(snid,rep) values (#{snid},#{story})
+    </insert>
+
+    <select id="getSuggestionNumberReplyById" parameterType="int" resultType="DreamStory">
+        select
+            snid
+             , <![CDATA[replace(rep,'<','&lt;') as story ]]>
+             , regd
+
+        <![CDATA[
+             ,CASE
+                  WHEN td < 60 THEN 'now'
+                  WHEN td >= 60 and td <=3600 THEN  concat(round(td/60),' min')
+                  WHEN td >= 3600 and td <=86400 THEN concat(round(td/3600),' hour')
+                  WHEN td >= 86400 and td <=604800 THEN concat(round(td/86400),' day')
+                  WHEN td >= 604800 and td <=2419200 THEN concat(round(td/604800),' week')
+                  WHEN td >= 2419200 THEN concat(round(td/2419200),' month')
+            END as timer
+            ]]>
+        from(
+
+
+        select
+            snid
+             ,rep
+             , date_format(reg_date, '%Y-%m-%d %H:%i') as regd
+             , TIMESTAMPDIFF(SECOND, reg_date, now())  as td
+        from wslt.lotto_suggestion_reply
+        where snid = #{_parameter}
+        order by reg_date desc
+        ) tmp
+    </select>
+
+    <select id="getSuggestionById" parameterType="int" resultType="DreamStory">
+        select idx,story,snid,result,isShow as iss,regd as regDate from lotto_suggestions
+        where idx = #{_parameter}
+    </select>
+
 </mapper>

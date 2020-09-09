@@ -57,5 +57,28 @@ public class LotteryApiController {
         return lotteryService.getSuggestionNumberDetailHtml(snid);
     }
 
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/nrp")
+    @ResponseBody
+    public String postNumberSuggestionReply(@RequestParam("i") int snid,@RequestParam("s") String story) {
+        return lotteryService.postNumberSuggestionReply(snid,story);
+    }
+
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/drp")
+    @ResponseBody
+    public String getSuggestionReply(@RequestParam("i") int snid) {
+        return lotteryService.getSuggestionNumberReplyById(snid);
+    }
+
 
 }
