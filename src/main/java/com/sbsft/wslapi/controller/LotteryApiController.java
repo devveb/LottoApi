@@ -80,5 +80,16 @@ public class LotteryApiController {
         return lotteryService.getSuggestionNumberReplyById(snid);
     }
 
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/ch")
+    @ResponseBody
+    public String getWinHistoryAndNumberValue(@RequestParam("r") String result) {
+        return lotteryService.getWinHistoryAndNumberValue(result);
+    }
+
 
 }

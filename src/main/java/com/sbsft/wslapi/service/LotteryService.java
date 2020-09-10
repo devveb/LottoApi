@@ -26,38 +26,88 @@ public class LotteryService {
     private DtnUtil dtnUtil;
 
     public String getWinNumbers(String story, int iss) {
-//        Map map;
-//        map = new HashMap<String,Object>();
-
 
         DreamStory ds = new DreamStory();
-
-
         String result = lotteryMapper.selectDreamNumber(dtnUtil.textCheck(story));
 
         ds.setStory(story);
         ds.setResult(result);
         ds.setIss(iss);
 
-        int numsetCnt = lotteryMapper.countNumberSet(ds);
-
-        if (numsetCnt < 1) {
-            lotteryMapper.insertNumberSet(ds);
-        } else {
-            lotteryMapper.updateSuggestionCount(ds);
-        }
-
-        NumSet ns = lotteryMapper.getNumberSet(ds);
-        ds.setSnid(ns.getIdx());
-        ds.setSugDate(ns.getSugDate());
+        getNumberSet(ds);
         lotteryMapper.insertDreamResult(ds);
         checkHistory(ds);
         return result;
     }
 
-    public List<String> checkHistory(DreamStory ds) {
+    public String getWinHistoryAndNumberValue(String result) {
+        String html ="";
+        DreamStory ds = new DreamStory();
+        ds.setResult(result);
+        getNumberSet(ds);
+        checkHistory(ds);
+
+        List<DreamStory> history = lotteryMapper.getSimHistory(ds);
+        NumSet ns = lotteryMapper.getNumberSetById(ds);
+
+        html = html+"<div class=\"m-demo__preview\">\n" +
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center\">\n" +
+                "<div class=\"m-stack__demo-item\">\n" +
+                ns.getNumberUnit()+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>"+
+
+                "<div class=\"m--space-10\"></div>\n" +
+                "<div class=\"m-stack m-stack--ver m-stack--tablet m-stack--demo\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--top\">\n" +
+                "<h6>추천횟수: "+ns.getSugCount()+"</h6>" +
+                "</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--middle\">\n";
+
+        html = getHistoryHtmlString(html, history, ns);
+
+
+        return html;
+    }
+
+    private String getHistoryHtmlString(String html, List<DreamStory> history, NumSet ns) {
+        if(history.size() > 0){
+            html = html+"<div style=\"overflow:scroll;height:100px;\">";
+            for(DreamStory dream : history){
+                html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"회</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"등 당첨</span><br></div></div>";
+            }
+            html=html+"</div>";
+        }else{
+            html=html+"<h6>당첨내역 없음</h6>";
+        }
+
+        html=html+"</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--bottom\">\n" +
+                "<h6>총 획득상금: "+
+                String.format("%,d",ns.getTotalPrize())+"원</h6>" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
+        return html;
+    }
+
+    private void getNumberSet(DreamStory ds) {
+        int numsetCnt = lotteryMapper.countNumberSet(ds);
+
+        if (numsetCnt < 1) lotteryMapper.insertNumberSet(ds);
+        else {
+            lotteryMapper.updateSuggestionCount(ds);
+        }
+        NumSet ns = lotteryMapper.getNumberSet(ds);
+        ds.setSnid(ns.getIdx());
+        ds.setSugDate(ns.getSugDate());
+    }
+
+    public void checkHistory(DreamStory ds) {
         NumSet dreamnum = new NumSet();
-        int totalPrize = 0;
+        long totalPrize = 0;
         List<String> resultStrs = new ArrayList<>();
 
         String[] arr = ds.getResult().split(",");
@@ -73,14 +123,19 @@ public class LotteryService {
 
         for (NumSet historyNum : historyNums) {
             int place = winChecker(historyNum, dreamnum);
-            if (place <= 3) {
+            if (place <= 5) {
                 if (place == 1) {
-                    totalPrize += Integer.parseInt(historyNum.getFirstPrize());
+                    totalPrize += Long.parseLong(historyNum.getFirstPrize());
                 } else if (place == 2) {
-                    totalPrize += Integer.parseInt(historyNum.getSecondPrize());
-                } else {
-                    totalPrize += Integer.parseInt(historyNum.getThirdPrize());
+                    totalPrize += Long.parseLong(historyNum.getSecondPrize());
+                } else if(place == 3){
+                    totalPrize += Long.parseLong(historyNum.getThirdPrize());
+                }else if(place == 4) {
+                    totalPrize += Long.parseLong(historyNum.getFourthPrize());
+                }else {
+                    totalPrize += 5000;
                 }
+
 
                 dreamnum.setPlace(place);
                 dreamnum.setDraw(historyNum.getDraw());
@@ -96,7 +151,6 @@ public class LotteryService {
         //lotteryMapper.insertNumberCombiTotalPrize(ns);
         lotteryMapper.updateNumberCombiTotalPrize(ns);
 
-        return resultStrs;
     }
 
     public List<NumSet> getDrawHistory() {
@@ -370,7 +424,7 @@ public class LotteryService {
                 "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
                 "<div class=\"m-stack__item m-stack__item--center\">\n" +
                 "<div class=\"m-stack__demo-item\">\n" +
-                "<h6>추천번호</h6>"+ns.getNumberUnit()+
+                ns.getNumberUnit()+
                 "</div>\n" +
                 "</div>\n" +
                 "</div>"+
@@ -382,29 +436,14 @@ public class LotteryService {
                 "</div>\n" +
                 "<div class=\"m-stack__item m-stack__item--center m-stack__item--middle\">\n";
 
-                if(history.size() > 0){
-                    html = html+"<div style=\"overflow:scroll;height:200px;\">";
-                    for(DreamStory dream : history){
-                        html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"</span><br></div></div>";
-                    }
-                    html=html+"</div>";
-                }else{
-                    html=html+"<h6>당첨내역 없음</h6>";
-                }
+        html = getHistoryHtmlString(html, history, ns);
 
-                html=html+"</div>\n" +
-                "<div class=\"m-stack__item m-stack__item--center m-stack__item--bottom\">\n" +
-                "<h6>총 획득상금: "+ns.getTotalPrize()+"</h6>" +
-                "</div>\n" +
-                "</div>\n" +
-                "</div>";
-
-                html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
+        html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
                         "<div class=\"input-group\">\n" +
                         "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
                         "<div class=\"input-group-append\">\n" +
-                        "<button class=\"btn btn-secondary\" type=\"button\" onclick=\"nrep("+ds.getSnid()+")\">\n" +
-                        "Go!\n" +
+                        "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep("+ds.getSnid()+")\">\n" +
+                        "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
                         "</button>\n" +
                         "</div>\n" +
                         "</div>\n" +
@@ -432,6 +471,7 @@ public class LotteryService {
 
 
     }
+
 }
 
 

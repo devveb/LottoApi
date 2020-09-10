@@ -78,7 +78,7 @@
             on sug.snid = num.idx
             where isShow = 1
             order by idx desc
-                limit ${_parameter},5
+                limit ${_parameter},7
             ) tmp
 
     </select>
@@ -105,7 +105,20 @@
     </select>
 
     <select id="getDrawHistory" resultType="NumSet">
-        select draw,first,second,third,fourth,fifth,sixth,bonus,first_prize as firstPrize,second_prize as secondPrize, third_prize as thirdPrize ,draw_date from wslt.lotto_draw_history
+        SELECT draw,
+               first,
+               second,
+               third,
+               fourth,
+               fifth,
+               sixth,
+               bonus,
+               first_prize  AS firstPrize,
+               second_prize AS secondPrize,
+               third_prize  AS thirdPrize,
+               fourth_prize  AS fourthPrize,
+               draw_date
+        FROM   wslt.lotto_draw_history
     </select>
 
     <insert id="insertDrawSimulation" parameterType="NumSet">
@@ -196,6 +209,7 @@
             wslt.lotto_draw_simmulation
         where
             nid = #{snid}
+        group by nid,draw
     </select>
 
     <insert id="postNumberSuggestionReply" parameterType="DreamStory">
