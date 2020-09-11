@@ -212,16 +212,20 @@
         group by nid,draw
     </select>
 
-    <insert id="postNumberSuggestionReply" parameterType="DreamStory">
-        insert into wslt.lotto_suggestion_reply(snid,rep) values (#{snid},#{story})
+    <insert id="postReply" parameterType="DreamStory">
+        <if test='type == "n"'>
+            insert into wslt.lotto_suggestion_reply(snid,rep) values (#{idx},#{story})
+        </if>
+        <if test='type== "s"'>
+            insert into wslt.lotto_story_reply(sid,rep) values (#{idx},#{story})
+        </if>
     </insert>
 
-    <select id="getSuggestionNumberReplyById" parameterType="int" resultType="DreamStory">
+    <select id="getReplyById" parameterType="DreamStory" resultType="DreamStory">
         select
-            snid
+            idx
              , <![CDATA[replace(rep,'<','&lt;') as story ]]>
              , regd
-
         <![CDATA[
              ,CASE
                   WHEN td < 60 THEN 'now'
@@ -236,12 +240,23 @@
 
 
         select
-            snid
-             ,rep
+        <if test= 'type == "n"'>
+            snid as idx
+        </if>
+        <if test= 'type == "s"'>
+            sid as idx
+        </if>
+        ,rep
              , date_format(reg_date, '%Y-%m-%d %H:%i') as regd
              , TIMESTAMPDIFF(SECOND, reg_date, now())  as td
-        from wslt.lotto_suggestion_reply
-        where snid = #{_parameter}
+        <if test='type == "n"'>
+            from wslt.lotto_suggestion_reply
+            where snid = #{idx}
+        </if>
+        <if test='type == "s"'>
+            from wslt.lotto_story_reply
+            where sid = #{idx}
+        </if>
         order by reg_date desc
         ) tmp
     </select>

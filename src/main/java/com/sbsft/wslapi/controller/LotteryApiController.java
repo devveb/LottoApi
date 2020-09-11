@@ -42,6 +42,7 @@ public class LotteryApiController {
     @PostMapping("/lm")
     @ResponseBody
     public String recentListAndModal(@RequestParam("p") int page) {
+
         return lotteryService.getListAndModal(page);
     }
 
@@ -53,8 +54,20 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/nd")
     @ResponseBody
-    public String getSuggestionNumberDetail(@RequestParam("snid") int snid) {
-        return lotteryService.getSuggestionNumberDetailHtml(snid);
+    public String getSuggestionNumberDetail(@RequestParam("nid") int nid) {
+        return lotteryService.getSuggestionNumberDetailHtml(nid);
+    }
+
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/sd")
+    @ResponseBody
+    public String getSuggestionStoryDetail(@RequestParam("sid") int sid) {
+        return lotteryService.getSuggestionStoryDetail(sid);
     }
 
     /**
@@ -62,10 +75,10 @@ public class LotteryApiController {
      * @return
      */
     @CrossOrigin
-    @PostMapping("/nrp")
+    @PostMapping("/rp")
     @ResponseBody
-    public String postNumberSuggestionReply(@RequestParam("i") int snid,@RequestParam("s") String story) {
-        return lotteryService.postNumberSuggestionReply(snid,story);
+    public String postReply(@RequestParam("t") String type,@RequestParam("i") int idx,@RequestParam("s") String story) {
+        return lotteryService.postNumberSuggestionReply(type,idx,story);
     }
 
 
@@ -76,8 +89,8 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/drp")
     @ResponseBody
-    public String getSuggestionReply(@RequestParam("i") int snid) {
-        return lotteryService.getSuggestionNumberReplyById(snid);
+    public String getSuggestionReply(@RequestParam("i") int idx) {
+        return lotteryService.getReplyById("n",idx);
     }
 
     /**

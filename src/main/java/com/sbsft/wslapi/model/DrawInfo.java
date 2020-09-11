@@ -32,6 +32,8 @@ public class DrawInfo {
     private String sugDate;
     private String regDate;
 
+    private String type;
+
     private int sugCount;
 
 }

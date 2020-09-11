@@ -215,18 +215,21 @@ public class LotteryService {
         for (DreamStory ds : dreamList) {
             historyHtml = historyHtml + "<div class=\"m-timeline-3__item m-timeline-3__item--info\">" +
                     "<span class=\"m-timeline-3__item-time\">" + ds.getTimer() + "</span>" + "<div class=\"m-timeline-3__item-desc\">"
-                    + "<span class=\"m-timeline-3__item-text\">" + ds.getStory().replaceAll("<","&lt;").replaceAll(">","&gt;")+ "</span>" + "<br>"
+                    + "<span class=\"m-timeline-3__item-text\">"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#s_modal_"+String.valueOf(ds.getIdx())+"\"  onclick=\"javascript:getSModalInfo("+idx+","+ds.getIdx()+");\">" + ds.getStory().replaceAll("<","&lt;") + "</a>"
+                    +  "</span><br>"
                     + "<span class=\"m-timeline-3__item-user-name\">"
-                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#m_modal_"+String.valueOf(idx)+"\"  onclick=\"javascript:getModalInfo("+idx+","+ds.getIdx()+");\">" + ds.getResult() + "</a>"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#n_modal_"+String.valueOf(ds.getSnid())+"\"  onclick=\"javascript:getModalInfo("+ds.getSnid()+");\">" + ds.getResult() + "</a>"
                     + "</span>" + "</div>" + "</div>"
-                    +makeModal(ds.getResult(),String.valueOf(idx));
+                    +makeModal("n",ds.getResult(),String.valueOf(ds.getSnid()))
+                    +makeModal("s",ds.getStory(),String.valueOf(idx));
                     idx++;
         }
         return historyHtml;
     }
 
-    public String makeModal(String title,String id){
-        return "<div class=\"modal fade\" id=\"m_modal_"+id+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" style=\"display: none;\" aria-hidden=\"true\">\n" +
+    public String makeModal(String type,String title,String id){
+        return "<div class=\"modal fade\" id=\""+type+"_modal_"+id+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" style=\"display: none;\" aria-hidden=\"true\">\n" +
                 "<div class=\"modal-dialog\" role=\"document\">\n" +
                 "<div class=\"modal-content\">\n" +
                 "<div class=\"modal-header\">\n" +
@@ -362,29 +365,36 @@ public class LotteryService {
         return lotteryMapper.seleteUnpackedSuggestionList();
     }
 
-    public String getSuggestionNumberReplyById(int snid){
+    public String getReplyById(String type,int idx){
+
+        DreamStory ds = new DreamStory();
+        ds.setIdx(idx);
+        ds.setType(type);
+
+        List<DreamStory> replyList = lotteryMapper.getReplyById(ds);
+
         String html ="<div class=\"m-section\">\n" +
                 "<div class=\"m-section__content\">\n" +
                 "<!--begin::Preview-->\n" +
                 "<div class=\"m-demo\">\n" +
                 "<div class=\"m-demo__preview\">\n" +
                 "<div class=\"m-list-timeline\">\n";
-        List<DreamStory> replyList = lotteryMapper.getSuggestionNumberReplyById(snid);
+
+
 
         if(replyList.size() > 0){
-            for(DreamStory ds : replyList){
+            for(DreamStory drs : replyList){
                 html=html+"<div class=\"m-list-timeline__items\">\n" +
                         "<div class=\"m-list-timeline__item\">\n" +
                         "<span class=\"m-list-timeline__badge\"></span>\n" +
                         "<span class=\"m-list-timeline__text\">\n" +
-                        ds.getStory()+
+                        drs.getStory()+
                         "</span>\n" +
                         "<span class=\"m-list-timeline__time\">\n" +
-                        ds.getTimer()+
+                        drs.getTimer()+
                         "</span>\n" +
                         "</div>\n" +
                         "</div>\n";
-
             }
         }else{
             html=html+"<div class=\"m-list-timeline__items\">\n" +
@@ -406,21 +416,47 @@ public class LotteryService {
     }
 
 
-    public String getSuggestionNumberDetailHtml(int snid) {
-        DreamStory ds = lotteryMapper.getSuggestionById(snid);
-        //ds.setSnid(snid);
+    public String getSuggestionStoryDetail(int sid) {
+        DreamStory ds = lotteryMapper.getSuggestionById(sid);
+
+        String html = "";
+        html = html+"<div class=\"m-demo__preview\">\n" +
+
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center\">\n" +
+                "<div class=\"m-stack__demo-item\">\n" +
+                ds.getResult()+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>"+
+                "<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
+                "<div class=\"input-group\">\n" +
+                "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
+                "<div class=\"input-group-append\">\n" +
+                "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep("+ds.getIdx()+")\">\n" +
+                "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
+                "</button>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
+
+        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getReplyById("s",ds.getIdx());
+
+        return html;
+    }
+
+
+    public String getSuggestionNumberDetailHtml(int nid) {
+        //DreamStory ds = lotteryMapper.getSuggestionById(nid);
+        //ds.setnid(nid);
+        DreamStory ds = new DreamStory();
+        ds.setSnid(nid);
         NumSet ns = lotteryMapper.getNumberSetById(ds);
         List<DreamStory> history = lotteryMapper.getSimHistory(ds);
 
         String html = "";
         html = html+"<div class=\"m-demo__preview\">\n" +
-                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\">\n" +
-                "<div class=\"m-stack__item m-stack__item--left\">\n" +
-                "<div class=\"m-stack__demo-item\">\n" +
-                ds.getStory()+
-                "</div>\n" +
-                "</div>\n" +
-                "</div>"+
+
                 "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
                 "<div class=\"m-stack__item m-stack__item--center\">\n" +
                 "<div class=\"m-stack__demo-item\">\n" +
@@ -442,28 +478,29 @@ public class LotteryService {
                         "<div class=\"input-group\">\n" +
                         "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
                         "<div class=\"input-group-append\">\n" +
-                        "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep("+ds.getSnid()+")\">\n" +
+                        "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep('n',"+ds.getSnid()+")\">\n" +
                         "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
                         "</button>\n" +
                         "</div>\n" +
                         "</div>\n" +
                         "</div>";
 
-                        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getSuggestionNumberReplyById(ds.getSnid());
+                        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getReplyById("n",ds.getSnid());
 
 
 
         return html;
     }
 
-    public String postNumberSuggestionReply(int snid, String story) {
+    public String postNumberSuggestionReply(String type,int idx, String story) {
         DreamStory ds = new DreamStory();
         String code ="200";
         try{
+            ds.setType(type);
             ds.setStory(story.replaceAll("<","&lt;"));
-            ds.setSnid(snid);
+            ds.setIdx(idx);
 
-            lotteryMapper.postNumberSuggestionReply(ds);
+            lotteryMapper.postReply(ds);
         }catch (Exception e){
             code="999";
         }
@@ -471,6 +508,7 @@ public class LotteryService {
 
 
     }
+
 
 }
 
