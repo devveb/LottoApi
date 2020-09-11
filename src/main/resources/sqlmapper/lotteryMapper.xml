@@ -261,9 +261,24 @@
         ) tmp
     </select>
 
+    <select id="getReplyCnt" parameterType="DreamStory" resultType="int">
+        select count(*) as cnt
+        <if test='type == "n"'>
+            from wslt.lotto_suggestion_reply
+            where snid = #{idx}
+        </if>
+        <if test='type == "s"'>
+            from wslt.lotto_story_reply
+            where sid = #{idx}
+        </if>
+
+    </select>
+
     <select id="getSuggestionById" parameterType="int" resultType="DreamStory">
         select idx,story,snid,result,isShow as iss,regd as regDate from lotto_suggestions
         where idx = #{_parameter}
     </select>
+
+
 
 </mapper>

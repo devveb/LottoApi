@@ -216,16 +216,24 @@ public class LotteryService {
             historyHtml = historyHtml + "<div class=\"m-timeline-3__item m-timeline-3__item--info\">" +
                     "<span class=\"m-timeline-3__item-time\">" + ds.getTimer() + "</span>" + "<div class=\"m-timeline-3__item-desc\">"
                     + "<span class=\"m-timeline-3__item-text\">"
-                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#s_modal_"+String.valueOf(ds.getIdx())+"\"  onclick=\"javascript:getSModalInfo("+idx+","+ds.getIdx()+");\">" + ds.getStory().replaceAll("<","&lt;") + "</a>"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#s_modal_"+String.valueOf(ds.getIdx())+"\"  onclick=\"javascript:getSModalInfo("+ds.getIdx()+");\">" + ds.getStory().replaceAll("<","&lt;")+"&nbsp;["+getReplyCnt("s",ds.getIdx()) + "]</a>"
                     +  "</span><br>"
                     + "<span class=\"m-timeline-3__item-user-name\">"
-                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#n_modal_"+String.valueOf(ds.getSnid())+"\"  onclick=\"javascript:getModalInfo("+ds.getSnid()+");\">" + ds.getResult() + "</a>"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#n_modal_"+String.valueOf(ds.getSnid())+"\"  onclick=\"javascript:getModalInfo("+ds.getSnid()+");\">" + ds.getResult() +"&nbsp;["+getReplyCnt("n",ds.getSnid()) + "]</a>"
                     + "</span>" + "</div>" + "</div>"
                     +makeModal("n",ds.getResult(),String.valueOf(ds.getSnid()))
-                    +makeModal("s",ds.getStory(),String.valueOf(idx));
+                    +makeModal("s",ds.getStory(),String.valueOf(ds.getIdx()));
                     idx++;
         }
         return historyHtml;
+    }
+
+    private String getReplyCnt(String type, int idx) {
+        DreamStory ds = new DreamStory();
+        ds.setType(type);
+        ds.setIdx(idx);
+        int cnt = lotteryMapper.getReplyCnt(ds);
+        return String.valueOf(cnt);
     }
 
     public String makeModal(String type,String title,String id){
@@ -425,15 +433,15 @@ public class LotteryService {
                 "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
                 "<div class=\"m-stack__item m-stack__item--center\">\n" +
                 "<div class=\"m-stack__demo-item\">\n" +
-                ds.getResult()+
+                ds.getStory()+
                 "</div>\n" +
                 "</div>\n" +
                 "</div>"+
                 "<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
                 "<div class=\"input-group\">\n" +
-                "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
+                "<input type=\"text\" class=\"form-control\" id=\"reptxt\" placeholder=\"Reply...\">\n" +
                 "<div class=\"input-group-append\">\n" +
-                "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep("+ds.getIdx()+")\">\n" +
+                "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep('s',"+ds.getIdx()+")\">\n" +
                 "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
                 "</button>\n" +
                 "</div>\n" +
@@ -476,7 +484,7 @@ public class LotteryService {
 
         html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
                         "<div class=\"input-group\">\n" +
-                        "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
+                        "<input type=\"text\" class=\"form-control\" id=\"reptxt\" placeholder=\"Reply...\">\n" +
                         "<div class=\"input-group-append\">\n" +
                         "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep('n',"+ds.getSnid()+")\">\n" +
                         "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +

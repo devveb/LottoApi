@@ -49,4 +49,6 @@ public interface LotteryMapper {
     List<DreamStory> getReplyById(DreamStory ds);
 
     DreamStory getSuggestionById(int snid);
+
+    int getReplyCnt(DreamStory ds);
 }

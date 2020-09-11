@@ -89,8 +89,8 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/drp")
     @ResponseBody
-    public String getSuggestionReply(@RequestParam("i") int idx) {
-        return lotteryService.getReplyById("n",idx);
+    public String getSuggestionReply(@RequestParam("t") String type,@RequestParam("i") int idx) {
+        return lotteryService.getReplyById(type,idx);
     }
 
     /**
