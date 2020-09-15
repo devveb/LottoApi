@@ -119,7 +119,7 @@ public class LotteryService {
         dreamnum.setSixth(arr[5]);
         dreamnum.setIdx(ds.getSnid());
 
-        List<NumSet> historyNums = lotteryMapper.getDrawHistory();
+        List<NumSet> historyNums = lotteryMapper.getDrawHistory(dreamnum);
 
         for (NumSet historyNum : historyNums) {
             int place = winChecker(historyNum, dreamnum);
@@ -151,10 +151,6 @@ public class LotteryService {
         //lotteryMapper.insertNumberCombiTotalPrize(ns);
         lotteryMapper.updateNumberCombiTotalPrize(ns);
 
-    }
-
-    public List<NumSet> getDrawHistory() {
-        return lotteryMapper.getDrawHistory();
     }
 
     public int winChecker(NumSet winnum, NumSet dreamnum) {
@@ -518,6 +514,26 @@ public class LotteryService {
     }
 
 
+    public String getDrawHistoryHtml(int draw) {
+        String html ="";
+        NumSet ns = new NumSet();
+        ns.setDraw(draw);
+        List<NumSet> drawHistory = lotteryMapper.getDrawHistory(ns);
+
+        for(NumSet dr : drawHistory){
+            html = html + "<div class=\"m-list-timeline__item\">\n" +
+                    "<span class=\"m-list-timeline__badge\"></span>\n" +
+                    "<span class=\"m-list-timeline__time\">\n" +
+                    dr.getDraw()+"회</br>"+dr.getDrawDate()+
+                    "</span>\n" +
+                    "<span class=\"m-list-timeline__badge\"></span>\n" +
+                    "<span class=\"m-list-timeline__text\">\n" +
+                    dr.getFirst()+" , "+dr.getSecond()+" , "+dr.getThird()+" , "+dr.getFourth()+" , "+dr.getFifth()+" , "+dr.getSixth()+"| 보너스: "+dr.getBonus()+
+                    "</span>\n" +
+                    "</div>";
+        }
+        return html;
+    }
 }
 
 

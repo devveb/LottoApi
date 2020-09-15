@@ -22,7 +22,7 @@ public interface LotteryMapper {
 
     List<DreamStory> selectDreamResultList(int page);
 
-    List<NumSet> getDrawHistory();
+    List<NumSet> getDrawHistory(NumSet draw);
 
     void insertDrawSimulation(NumSet dreamnum);
 

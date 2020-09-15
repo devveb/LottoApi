@@ -104,5 +104,16 @@ public class LotteryApiController {
         return lotteryService.getWinHistoryAndNumberValue(result);
     }
 
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/dh")
+    @ResponseBody
+    public String getDrawHistoryHtml(@RequestParam("d") int draw) {
+        return lotteryService.getDrawHistoryHtml(draw);
+    }
+
 
 }

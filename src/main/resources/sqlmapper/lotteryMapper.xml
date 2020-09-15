@@ -104,7 +104,7 @@
                                       ) tmp2
     </select>
 
-    <select id="getDrawHistory" resultType="NumSet">
+    <select id="getDrawHistory" resultType="NumSet" parameterType="NumSet">
         SELECT draw,
                first,
                second,
@@ -119,6 +119,10 @@
                fourth_prize  AS fourthPrize,
                draw_date
         FROM   wslt.lotto_draw_history
+        <if test="draw != 0">
+            where draw = #{draw}
+        </if>
+        order by draw desc
     </select>
 
     <insert id="insertDrawSimulation" parameterType="NumSet">
@@ -257,6 +261,7 @@
             from wslt.lotto_story_reply
             where sid = #{idx}
         </if>
+        and iss = 1
         order by reg_date desc
         ) tmp
     </select>
@@ -271,6 +276,7 @@
             from wslt.lotto_story_reply
             where sid = #{idx}
         </if>
+            and iss = 1
 
     </select>
 
