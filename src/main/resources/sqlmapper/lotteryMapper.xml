@@ -201,19 +201,25 @@
     </select>
 
     <select id="getSimHistory" parameterType="DreamStory" resultType="DreamStory">
-        select
+        select distinct
             idx
-            ,nid as snid
-            ,draw
-            ,place
-            ,sug_date as sugDate
-            ,draw_date as drawDate
-            ,reg_date as regDate
+                      ,nid as snid
+                      ,sim.draw
+                      ,place
+                      ,his.first_prize as firstPrizeInt
+                      ,his.second_prize as secondPrizeInt
+                      ,his.third_prize as thirdPrizeInt
+                      ,his.fourth_prize as fourthPrizeInt
+                      ,sim.draw_date as drawDate
+                      ,sim.reg_date as regDate
         from
-            wslt.lotto_draw_simmulation
+            wslt.lotto_draw_simmulation sim
+                left outer join wslt.lotto_draw_history his
+                                on sim.draw = his.draw
         where
             nid = #{snid}
         group by nid,draw
+        order by draw desc
     </select>
 
     <insert id="postReply" parameterType="DreamStory">

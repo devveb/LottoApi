@@ -74,11 +74,21 @@ public class LotteryService {
 
     private String getHistoryHtmlString(String html, List<DreamStory> history, NumSet ns) {
         if(history.size() > 0){
-            html = html+"<div style=\"overflow:scroll;height:100px;\">";
-            for(DreamStory dream : history){
-                html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"회</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"등 당첨</span><br></div></div>";
+            html = html+"<div class=\"m-list-timeline\" style=\"overflow:scroll;height:100px;\">";
+            html = html+"<div class=\"m-list-timeline__items\">";
+            for(DreamStory dr : history){
+                html=html + "<div class=\"m-list-timeline__item\">\n" +
+                        "<span class=\"m-list-timeline__badge\"></span>\n" +
+                        "<span class=\"m-list-timeline__time\">\n" +
+                        dr.getDraw()+"회</br>"+dr.getDrawDate()+
+                        "</span>\n" +
+                        "<span class=\"m-list-timeline__badge\"></span>\n" +
+                        "<span class=\"m-list-timeline__text\" style\"font-size:22px;\">\n" +
+                        dr.getPlace()+"등 당첨 상금 : "+getPrize(dr)+
+                        "</span>\n" +
+                        "</div>";;
             }
-            html=html+"</div>";
+            html=html+"</div></div>";
         }else{
             html=html+"<h6>당첨내역 없음</h6>";
         }
@@ -91,6 +101,22 @@ public class LotteryService {
                 "</div>\n" +
                 "</div>";
         return html;
+    }
+
+    private String getPrize(DreamStory dr) {
+        String rt ="";
+        if(dr.getPlace() == 1){
+            rt= String.format("%,d",dr.getFirstPrizeInt())+"원";
+        }else if(dr.getPlace() == 2){
+            rt= String.format("%,d",dr.getSecondPrizeInt())+"원";
+        }else if(dr.getPlace() == 3){
+            rt= String.format("%,d",dr.getThirdPrizeInt())+"원";
+        }else if(dr.getPlace() == 4){
+            rt= String.format("%,d",dr.getFourthPrizeInt())+"원";
+        }else if(dr.getPlace() == 5){
+            rt= String.format("%,d",5000)+"원";
+        }
+        return rt;
     }
 
     private void getNumberSet(DreamStory ds) {
@@ -240,7 +266,7 @@ public class LotteryService {
                 "<h5 class=\"modal-title\" id=\"exampleModalLabel\">\n" +
                 "토론방"+
                 "</h5>\n" +
-                "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
+                "<button type=\"button\" class=\"close close-refresh\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
                 "<span aria-hidden=\"true\">\n" +
                 "×\n" +
                 "</span>\n" +
@@ -249,7 +275,7 @@ public class LotteryService {
                 "<div class=\"modal-body\">\n" +
                 "</div>\n" +
                 "<div class=\"modal-footer\">\n" +
-                "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">\n" +
+                "<button type=\"button\" class=\"btn btn-secondary  close-refresh\" data-dismiss=\"modal\">\n" +
                 "Close\n" +
                 "</button>\n" +
                 "</div>\n" +
@@ -527,7 +553,7 @@ public class LotteryService {
                     dr.getDraw()+"회</br>"+dr.getDrawDate()+
                     "</span>\n" +
                     "<span class=\"m-list-timeline__badge\"></span>\n" +
-                    "<span class=\"m-list-timeline__text\">\n" +
+                    "<span class=\"m-list-timeline__text\" style\"font-size:22px;\">\n" +
                     dr.getFirst()+" , "+dr.getSecond()+" , "+dr.getThird()+" , "+dr.getFourth()+" , "+dr.getFifth()+" , "+dr.getSixth()+"| 보너스: "+dr.getBonus()+
                     "</span>\n" +
                     "</div>";
