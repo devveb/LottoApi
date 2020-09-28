@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertDreamResult" parameterType="DreamStory" useGeneratedKeys="true" keyProperty="idx" keyColumn="idx">
-        insert into wslt.lotto_suggestions(story,snid,isShow) VALUES (#{story},#{snid},#{iss})
+        insert into wslt.lotto_suggestions(story,snid,isShow,targetDraw) VALUES (#{story},#{snid},#{iss},#{targetDraw})
 
     </insert>
 

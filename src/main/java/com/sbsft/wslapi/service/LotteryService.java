@@ -35,8 +35,10 @@ public class LotteryService {
         ds.setIss(iss);
 
         getNumberSet(ds);
+        ds.setTargetDraw((long) getDrawNumberBasedOnStandardDate().get("nxt"));
         lotteryMapper.insertDreamResult(ds);
         checkHistory(ds);
+
         return result;
     }
 
@@ -226,6 +228,7 @@ public class LotteryService {
     }
 
     public List<DreamStory> dlist(int page) {
+
         return lotteryMapper.selectDreamResultList(page);
     }
 
