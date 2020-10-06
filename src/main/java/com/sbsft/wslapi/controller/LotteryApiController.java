@@ -19,8 +19,8 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/wtn")
     @ResponseBody
-    public String storyToNum(@RequestParam String story,@RequestParam int iss) {
-        return lotteryService.getWinNumbers(story,iss);
+    public String storyToNum(@RequestParam String story,@RequestParam int iss,@RequestParam int digit) {
+        return lotteryService.getWinNumbers(story,iss,digit);
     }
 
     /**

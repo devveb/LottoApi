@@ -83,7 +83,7 @@
 
     </select>
 
-    <select id="selectDreamNumber" resultType="String" parameterType="String">
+    <select id="selectDreamNumber" resultType="String" parameterType="DreamStory">
         select GROUP_CONCAT(num) from (
                                           select num,sum(count) as sc from (
                                                                                SELECT
@@ -100,7 +100,7 @@
                                                                            ) tmp
                                           group by num
                                           order by sc desc
-                                          limit 6
+                                          limit #{digit}
                                       ) tmp2
     </select>
 

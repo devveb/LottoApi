@@ -16,7 +16,7 @@ public interface LotteryMapper {
 
     void insertDrawHistory(NumSet ns);
 
-    String selectDreamNumber(String textCheck);
+    String selectDreamNumber(DreamStory ds);
 
     void insertDreamResult(DreamStory ds);
 

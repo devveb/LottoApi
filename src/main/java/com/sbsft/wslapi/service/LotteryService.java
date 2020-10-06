@@ -25,10 +25,13 @@ public class LotteryService {
     @Autowired
     private DtnUtil dtnUtil;
 
-    public String getWinNumbers(String story, int iss) {
+    public String getWinNumbers(String story, int iss , int digit) {
 
         DreamStory ds = new DreamStory();
-        String result = lotteryMapper.selectDreamNumber(dtnUtil.textCheck(story));
+        ds.setStory(dtnUtil.textCheck(story));
+        ds.setDigit(digit);
+
+        String result = lotteryMapper.selectDreamNumber(ds);
 
         ds.setStory(story);
         ds.setResult(result);
@@ -292,14 +295,13 @@ public class LotteryService {
         String standardDate = "2002-12-07 23:59:59";
         long nextEpi = 0;
         long presentEpi = 0;
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Long> map = new HashMap<>();
 
-        try {
+        try{
 
             Date cDate = new Date();
             Date sDate = dateFormat.parse(standardDate);
             long diff = cDate.getTime() - sDate.getTime();
-
 
             nextEpi = (diff / (86400 * 1000 * 7)) + 2;
             presentEpi = nextEpi - 1;
@@ -352,11 +354,11 @@ public class LotteryService {
         return lotteryMapper.getMaxDraw();
     }
 
-    public int getPresentDraw() {
+    public Map<String, Integer> getPresentDraw() {
         String standardDate = "2002-12-07 23:59:59";
-        long nextEpi = 0;
-        long presentEpi = 0;
-        Map<String, Object> map = new HashMap<>();
+        int nextEpi = 0;
+        int presentEpi = 0;
+        Map<String, Integer> map = new HashMap<>();
 
         try {
 
@@ -365,7 +367,7 @@ public class LotteryService {
             long diff = cDate.getTime() - sDate.getTime();
 
 
-            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
+            nextEpi = (int) ((diff / (86400 * 1000 * 7)) + 2);
             presentEpi = nextEpi - 1;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -373,7 +375,8 @@ public class LotteryService {
 
         map.put("nxt", nextEpi);
         map.put("present", presentEpi);
-        return Integer.parseInt(String.valueOf(presentEpi));
+        return map;
+//        return Integer.parseInt(String.valueOf(presentEpi));
 
     }
 
