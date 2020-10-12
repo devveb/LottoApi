@@ -16,4 +16,5 @@ public class NumSet extends DrawInfo {
     private String rip;
     private String numberUnit;
     private long totalPrize;
+    private String prize;
 }

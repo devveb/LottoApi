@@ -116,4 +116,16 @@ public class LotteryApiController {
     }
 
 
+    /**
+     * get weekly result
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/wkl")
+    @ResponseBody
+    public String getWeeklyResult(@RequestParam("d") int draw) {
+        return lotteryService.getWeeklyResult(draw);
+    }
+
+
 }

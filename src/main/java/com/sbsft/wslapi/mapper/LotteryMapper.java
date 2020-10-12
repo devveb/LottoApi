@@ -18,7 +18,7 @@ public interface LotteryMapper {
 
     String selectDreamNumber(DreamStory ds);
 
-    void insertDreamResult(DreamStory ds);
+    void insertDreamResult (DreamStory ds);
 
     List<DreamStory> selectDreamResultList(int page);
 
@@ -51,4 +51,12 @@ public interface LotteryMapper {
     DreamStory getSuggestionById(int snid);
 
     int getReplyCnt(DreamStory ds);
+
+    NumSet getDrawNumSet(int presentDraw);
+
+    List<DreamStory> getTargetDrawSuggestion(int presentDraw);
+
+    void insertWeeklyDrawResult(NumSet ns);
+
+    List<DreamStory> getWeeklyResult(NumSet ns);
 }

@@ -291,6 +291,37 @@
         where idx = #{_parameter}
     </select>
 
+    <select id="getDrawNumSet" parameterType="int" resultType="NumSet">
+        select draw,first,second,third,fourth,fifth,sixth,bonus,draw_date as drawDate from wslt.lotto_draw_history
+        where draw =#{_parameter}
+    </select>
 
+    <select id="getTargetDrawSuggestion" parameterType="int" resultType="DreamStory">
+        select snm.number_set as result, snm.idx as snid from wslt.lotto_suggestions sug
+        left join wslt.lotto_suggestion_numset snm
+        on sug.snid = snm.idx
+        where sug.targetDraw = #{_parameter}
+    </select>
+
+    <insert id="insertWeeklyDrawResult" parameterType="NumSet">
+        insert into wslt.lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx})
+    </insert>
+
+    <select id="getWeeklyResult" parameterType="NumSet" resultType="DreamStory">
+        select
+             draw
+             ,place
+             ,stake as prize
+             ,number_set as result
+             ,snid
+        from
+             lotto_weekly_draw_history wdh
+        left join
+             lotto_suggestion_numset snm
+        on
+            wdh.snid = snm.idx
+        where
+              draw = #{draw}
+    </select>
 
 </mapper>

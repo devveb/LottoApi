@@ -38,7 +38,7 @@ public class LotteryService {
         ds.setIss(iss);
 
         getNumberSet(ds);
-        ds.setTargetDraw((long) getDrawNumberBasedOnStandardDate().get("nxt"));
+        ds.setTargetDraw((long) this.getPresentDraw().get("nxt"));
         lotteryMapper.insertDreamResult(ds);
         checkHistory(ds);
 
@@ -141,13 +141,7 @@ public class LotteryService {
         long totalPrize = 0;
         List<String> resultStrs = new ArrayList<>();
 
-        String[] arr = ds.getResult().split(",");
-        dreamnum.setFirst(arr[0]);
-        dreamnum.setSecond(arr[1]);
-        dreamnum.setThird(arr[2]);
-        dreamnum.setFourth(arr[3]);
-        dreamnum.setFifth(arr[4]);
-        dreamnum.setSixth(arr[5]);
+        stringToNumSet(ds, dreamnum);
         dreamnum.setIdx(ds.getSnid());
 
         List<NumSet> historyNums = lotteryMapper.getDrawHistory(dreamnum);
@@ -291,29 +285,29 @@ public class LotteryService {
     }
 
 
-    public Map getDrawNumberBasedOnStandardDate() {
-        String standardDate = "2002-12-07 23:59:59";
-        long nextEpi = 0;
-        long presentEpi = 0;
-        Map<String, Long> map = new HashMap<>();
-
-        try{
-
-            Date cDate = new Date();
-            Date sDate = dateFormat.parse(standardDate);
-            long diff = cDate.getTime() - sDate.getTime();
-
-            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
-            presentEpi = nextEpi - 1;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        map.put("nxt", nextEpi);
-        map.put("present", presentEpi);
-        return map;
-
-    }
+//    public Map getDrawNumberBasedOnStandardDate() {
+//        String standardDate = "2002-12-07 23:59:59";
+//        long nextEpi = 0;
+//        long presentEpi = 0;
+//        Map<String, Long> map = new HashMap<>();
+//
+//        try{
+//
+//            Date cDate = new Date();
+//            Date sDate = dateFormat.parse(standardDate);
+//            long diff = cDate.getTime() - sDate.getTime();
+//
+//            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
+//            presentEpi = nextEpi - 1;
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        map.put("nxt", nextEpi);
+//        map.put("present", presentEpi);
+//        return map;
+//
+//    }
 
     public NumSet callWinNumApi(int nextEpisode) {
         NumSet ns = new NumSet();
@@ -565,6 +559,109 @@ public class LotteryService {
                     "</div>";
         }
         return html;
+    }
+
+    public NumSet getDrawNumSet(int presentDraw) {
+        return lotteryMapper.getDrawNumSet(presentDraw);
+    }
+
+    public List<NumSet> getSuggestionNumSet(int presentDraw) {
+        List<NumSet> list = new ArrayList<>();
+        List<DreamStory> dsList = lotteryMapper.getTargetDrawSuggestion(presentDraw);
+
+        for(DreamStory ds:dsList){
+            NumSet ns = new NumSet();
+            stringToNumSet(ds, ns);
+            ns.setIdx(ds.getSnid());
+            list.add(ns);
+        }
+
+        return list;
+
+    }
+
+    private void stringToNumSet(DreamStory ds, NumSet ns) {
+        String[] digit = ds.getResult().split(",");
+        ns.setFirst(digit[0]);
+        ns.setSecond(digit[1]);
+        ns.setThird(digit[2]);
+        ns.setFourth(digit[3]);
+        ns.setFifth(digit[4]);
+        ns.setSixth(digit[5]);
+    }
+
+    public void insertWeeklyDrawResult(NumSet ns) {
+        lotteryMapper.insertWeeklyDrawResult(ns);
+    }
+
+    public String getWeeklyResult(int draw) {
+
+
+        if(draw == 0){
+            draw = this.getMaxDraw();
+        }
+        NumSet ns = lotteryMapper.getDrawNumSet(draw);
+        List<DreamStory> weeklyResult = lotteryMapper.getWeeklyResult(ns);
+
+        String html ="<div class=\"m-portlet\">\n" +
+                "<div class=\"m-portlet__head\">\n" +
+                "<div class=\"m-portlet__head-caption\">\n" +
+                "<div class=\"m-portlet__head-title\">\n" +
+                "<h3 class=\"m-portlet__head-text\">\n" +
+                ns.getDraw()+"회("+ns.getDrawDate()+") 결과"+
+                "</h3>\n" +
+//                "<div class=\"m-form__actions\">\n" +
+                "<select class=\"form-control\" id=\"wkld\" style=\"width: 60px;display: inline; margin-left:15px;\">\n";
+                for(int i = draw; 1 <= i; i--){
+                    html=html+"<option value=\""+i+"\">\n" +i+ "</option>\n";
+                }
+
+               html = html+
+                "</select>\n" +
+                "<button type=\"reset\" class=\"btn btn-primary\" onclick=\"javscript:wkll();\">\n" +
+                "\t조회\n" +
+                "</button>\n" +
+//                "</div>"+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "<div class=\"m-portlet__body\">\n" +
+                "<div class=\"m-section\">\n" +
+
+                        "<div class=\"m-section__content\">\n" +
+                        "<table class=\"table\">\n" +
+                        "<thead>\n" +
+                        "<tr>\n" +
+                        "<th>\n" +
+                        "#\n" +
+                        "</th>\n" +
+                        "<th>\n" +
+                        "\tNumber\n" +
+                        "</th>\n" +
+                        "<th>\n" +
+                        "\tPrize\n" +
+                        "</th>\n" +
+                        "</tr>\n" +
+                        "</thead>\n" +
+                        "<tbody>\n";
+                        if(weeklyResult.size() == 0) {
+                            html = html + "<tr><td colspan=\"3\">당첨결과가 없습니다 ㅠㅠ</td></tr>";
+                        }else{
+                            for(DreamStory result:weeklyResult){
+                                html=html+"<tr><td>"+result.getPlace()+"등</td><td>"+result.getResult()+"</td><td>"+result.getPrize()+"원</td></tr>";
+                            }
+                        }
+
+                        html = html+"</tbody>\n" +
+                        "</table>\n" +
+                        "</div>\n" +
+                        "</div>"+
+                "</div>\n" +
+                "</div>";
+
+
+
+        return  html;
     }
 }
 
