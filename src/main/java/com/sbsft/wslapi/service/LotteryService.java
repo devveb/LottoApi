@@ -25,62 +25,142 @@ public class LotteryService {
     @Autowired
     private DtnUtil dtnUtil;
 
-    public String getWinNumbers(String story, int iss) {
-//        Map map;
-//        map = new HashMap<String,Object>();
-
+    public String getWinNumbers(String story, int iss , int digit) {
 
         DreamStory ds = new DreamStory();
+        ds.setStory(dtnUtil.textCheck(story));
+        ds.setDigit(digit);
 
-
-        String result = lotteryMapper.selectDreamNumber(dtnUtil.textCheck(story));
+        String result = lotteryMapper.selectDreamNumber(ds);
 
         ds.setStory(story);
         ds.setResult(result);
         ds.setIss(iss);
 
-        int numsetCnt = lotteryMapper.countNumberSet(ds);
-
-        if (numsetCnt < 1) {
-            lotteryMapper.insertNumberSet(ds);
-        } else {
-            lotteryMapper.updateSuggestionCount(ds);
-        }
-
-        NumSet ns = lotteryMapper.getNumberSet(ds);
-        ds.setSnid(ns.getIdx());
-        ds.setSugDate(ns.getSugDate());
+        getNumberSet(ds);
+        ds.setTargetDraw((long) this.getPresentDraw().get("nxt"));
         lotteryMapper.insertDreamResult(ds);
         checkHistory(ds);
+
         return result;
     }
 
-    public List<String> checkHistory(DreamStory ds) {
+    public String getWinHistoryAndNumberValue(String result) {
+        String html ="";
+        DreamStory ds = new DreamStory();
+        ds.setResult(result);
+        getNumberSet(ds);
+        checkHistory(ds);
+
+        List<DreamStory> history = lotteryMapper.getSimHistory(ds);
+        NumSet ns = lotteryMapper.getNumberSetById(ds);
+
+        html = html+"<div class=\"m-demo__preview\">\n" +
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center\">\n" +
+                "<div class=\"m-stack__demo-item\">\n" +
+                ns.getNumberUnit()+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>"+
+
+                "<div class=\"m--space-10\"></div>\n" +
+                "<div class=\"m-stack m-stack--ver m-stack--tablet m-stack--demo\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--top\">\n" +
+                "<h6>추천횟수: "+ns.getSugCount()+"</h6>" +
+                "</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--middle\">\n";
+
+        html = getHistoryHtmlString(html, history, ns);
+
+
+        return html;
+    }
+
+    private String getHistoryHtmlString(String html, List<DreamStory> history, NumSet ns) {
+        if(history.size() > 0){
+            html = html+"<div class=\"m-list-timeline\" style=\"overflow:scroll;height:100px;\">";
+            html = html+"<div class=\"m-list-timeline__items\">";
+            for(DreamStory dr : history){
+                html=html + "<div class=\"m-list-timeline__item\">\n" +
+                        "<span class=\"m-list-timeline__badge\"></span>\n" +
+                        "<span class=\"m-list-timeline__time\">\n" +
+                        dr.getDraw()+"회</br>"+dr.getDrawDate()+
+                        "</span>\n" +
+                        "<span class=\"m-list-timeline__badge\"></span>\n" +
+                        "<span class=\"m-list-timeline__text\" style\"font-size:22px;\">\n" +
+                        dr.getPlace()+"등 당첨 상금 : "+getPrize(dr)+
+                        "</span>\n" +
+                        "</div>";;
+            }
+            html=html+"</div></div>";
+        }else{
+            html=html+"<h6>당첨내역 없음</h6>";
+        }
+
+        html=html+"</div>\n" +
+                "<div class=\"m-stack__item m-stack__item--center m-stack__item--bottom\">\n" +
+                "<h6>총 획득상금: "+
+                String.format("%,d",ns.getTotalPrize())+"원</h6>" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
+        return html;
+    }
+
+    private String getPrize(DreamStory dr) {
+        String rt ="";
+        if(dr.getPlace() == 1){
+            rt= String.format("%,d",dr.getFirstPrizeInt())+"원";
+        }else if(dr.getPlace() == 2){
+            rt= String.format("%,d",dr.getSecondPrizeInt())+"원";
+        }else if(dr.getPlace() == 3){
+            rt= String.format("%,d",dr.getThirdPrizeInt())+"원";
+        }else if(dr.getPlace() == 4){
+            rt= String.format("%,d",dr.getFourthPrizeInt())+"원";
+        }else if(dr.getPlace() == 5){
+            rt= String.format("%,d",5000)+"원";
+        }
+        return rt;
+    }
+
+    private void getNumberSet(DreamStory ds) {
+        int numsetCnt = lotteryMapper.countNumberSet(ds);
+
+        if (numsetCnt < 1) lotteryMapper.insertNumberSet(ds);
+        else {
+            lotteryMapper.updateSuggestionCount(ds);
+        }
+        NumSet ns = lotteryMapper.getNumberSet(ds);
+        ds.setSnid(ns.getIdx());
+        ds.setSugDate(ns.getSugDate());
+    }
+
+    public void checkHistory(DreamStory ds) {
         NumSet dreamnum = new NumSet();
-        int totalPrize = 0;
+        long totalPrize = 0;
         List<String> resultStrs = new ArrayList<>();
 
-        String[] arr = ds.getResult().split(",");
-        dreamnum.setFirst(arr[0]);
-        dreamnum.setSecond(arr[1]);
-        dreamnum.setThird(arr[2]);
-        dreamnum.setFourth(arr[3]);
-        dreamnum.setFifth(arr[4]);
-        dreamnum.setSixth(arr[5]);
+        stringToNumSet(ds, dreamnum);
         dreamnum.setIdx(ds.getSnid());
 
-        List<NumSet> historyNums = lotteryMapper.getDrawHistory();
+        List<NumSet> historyNums = lotteryMapper.getDrawHistory(dreamnum);
 
         for (NumSet historyNum : historyNums) {
             int place = winChecker(historyNum, dreamnum);
-            if (place <= 3) {
+            if (place <= 5) {
                 if (place == 1) {
-                    totalPrize += Integer.parseInt(historyNum.getFirstPrize());
+                    totalPrize += Long.parseLong(historyNum.getFirstPrize());
                 } else if (place == 2) {
-                    totalPrize += Integer.parseInt(historyNum.getSecondPrize());
-                } else {
-                    totalPrize += Integer.parseInt(historyNum.getThirdPrize());
+                    totalPrize += Long.parseLong(historyNum.getSecondPrize());
+                } else if(place == 3){
+                    totalPrize += Long.parseLong(historyNum.getThirdPrize());
+                }else if(place == 4) {
+                    totalPrize += Long.parseLong(historyNum.getFourthPrize());
+                }else {
+                    totalPrize += 5000;
                 }
+
 
                 dreamnum.setPlace(place);
                 dreamnum.setDraw(historyNum.getDraw());
@@ -96,11 +176,6 @@ public class LotteryService {
         //lotteryMapper.insertNumberCombiTotalPrize(ns);
         lotteryMapper.updateNumberCombiTotalPrize(ns);
 
-        return resultStrs;
-    }
-
-    public List<NumSet> getDrawHistory() {
-        return lotteryMapper.getDrawHistory();
     }
 
     public int winChecker(NumSet winnum, NumSet dreamnum) {
@@ -150,6 +225,7 @@ public class LotteryService {
     }
 
     public List<DreamStory> dlist(int page) {
+
         return lotteryMapper.selectDreamResultList(page);
     }
 
@@ -161,25 +237,36 @@ public class LotteryService {
         for (DreamStory ds : dreamList) {
             historyHtml = historyHtml + "<div class=\"m-timeline-3__item m-timeline-3__item--info\">" +
                     "<span class=\"m-timeline-3__item-time\">" + ds.getTimer() + "</span>" + "<div class=\"m-timeline-3__item-desc\">"
-                    + "<span class=\"m-timeline-3__item-text\">" + ds.getStory().replaceAll("<","&lt;").replaceAll(">","&gt;")+ "</span>" + "<br>"
+                    + "<span class=\"m-timeline-3__item-text\">"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#s_modal_"+String.valueOf(ds.getIdx())+"\"  onclick=\"javascript:getSModalInfo("+ds.getIdx()+");\">" + ds.getStory().replaceAll("<","&lt;")+"&nbsp;["+getReplyCnt("s",ds.getIdx()) + "]</a>"
+                    +  "</span><br>"
                     + "<span class=\"m-timeline-3__item-user-name\">"
-                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#m_modal_"+String.valueOf(idx)+"\"  onclick=\"javascript:getModalInfo("+idx+","+ds.getIdx()+");\">" + ds.getResult() + "</a>"
+                    + "<a href=\"#\" data-toggle=\"modal\" data-target=\"#n_modal_"+String.valueOf(ds.getSnid())+"\"  onclick=\"javascript:getModalInfo("+ds.getSnid()+");\">" + ds.getResult() +"&nbsp;["+getReplyCnt("n",ds.getSnid()) + "]</a>"
                     + "</span>" + "</div>" + "</div>"
-                    +makeModal(ds.getResult(),String.valueOf(idx));
+                    +makeModal("n",ds.getResult(),String.valueOf(ds.getSnid()))
+                    +makeModal("s",ds.getStory(),String.valueOf(ds.getIdx()));
                     idx++;
         }
         return historyHtml;
     }
 
-    public String makeModal(String title,String id){
-        return "<div class=\"modal fade\" id=\"m_modal_"+id+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" style=\"display: none;\" aria-hidden=\"true\">\n" +
+    private String getReplyCnt(String type, int idx) {
+        DreamStory ds = new DreamStory();
+        ds.setType(type);
+        ds.setIdx(idx);
+        int cnt = lotteryMapper.getReplyCnt(ds);
+        return String.valueOf(cnt);
+    }
+
+    public String makeModal(String type,String title,String id){
+        return "<div class=\"modal fade\" id=\""+type+"_modal_"+id+"\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"exampleModalLabel\" style=\"display: none;\" aria-hidden=\"true\">\n" +
                 "<div class=\"modal-dialog\" role=\"document\">\n" +
                 "<div class=\"modal-content\">\n" +
                 "<div class=\"modal-header\">\n" +
                 "<h5 class=\"modal-title\" id=\"exampleModalLabel\">\n" +
                 "토론방"+
                 "</h5>\n" +
-                "<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
+                "<button type=\"button\" class=\"close close-refresh\" data-dismiss=\"modal\" aria-label=\"Close\">\n" +
                 "<span aria-hidden=\"true\">\n" +
                 "×\n" +
                 "</span>\n" +
@@ -188,7 +275,7 @@ public class LotteryService {
                 "<div class=\"modal-body\">\n" +
                 "</div>\n" +
                 "<div class=\"modal-footer\">\n" +
-                "<button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">\n" +
+                "<button type=\"button\" class=\"btn btn-secondary  close-refresh\" data-dismiss=\"modal\">\n" +
                 "Close\n" +
                 "</button>\n" +
                 "</div>\n" +
@@ -198,30 +285,29 @@ public class LotteryService {
     }
 
 
-    public Map getDrawNumberBasedOnStandardDate() {
-        String standardDate = "2002-12-07 23:59:59";
-        long nextEpi = 0;
-        long presentEpi = 0;
-        Map<String, Object> map = new HashMap<>();
-
-        try {
-
-            Date cDate = new Date();
-            Date sDate = dateFormat.parse(standardDate);
-            long diff = cDate.getTime() - sDate.getTime();
-
-
-            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
-            presentEpi = nextEpi - 1;
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        map.put("nxt", nextEpi);
-        map.put("present", presentEpi);
-        return map;
-
-    }
+//    public Map getDrawNumberBasedOnStandardDate() {
+//        String standardDate = "2002-12-07 23:59:59";
+//        long nextEpi = 0;
+//        long presentEpi = 0;
+//        Map<String, Long> map = new HashMap<>();
+//
+//        try{
+//
+//            Date cDate = new Date();
+//            Date sDate = dateFormat.parse(standardDate);
+//            long diff = cDate.getTime() - sDate.getTime();
+//
+//            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
+//            presentEpi = nextEpi - 1;
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        map.put("nxt", nextEpi);
+//        map.put("present", presentEpi);
+//        return map;
+//
+//    }
 
     public NumSet callWinNumApi(int nextEpisode) {
         NumSet ns = new NumSet();
@@ -262,11 +348,11 @@ public class LotteryService {
         return lotteryMapper.getMaxDraw();
     }
 
-    public int getPresentDraw() {
+    public Map<String, Integer> getPresentDraw() {
         String standardDate = "2002-12-07 23:59:59";
-        long nextEpi = 0;
-        long presentEpi = 0;
-        Map<String, Object> map = new HashMap<>();
+        int nextEpi = 0;
+        int presentEpi = 0;
+        Map<String, Integer> map = new HashMap<>();
 
         try {
 
@@ -275,7 +361,7 @@ public class LotteryService {
             long diff = cDate.getTime() - sDate.getTime();
 
 
-            nextEpi = (diff / (86400 * 1000 * 7)) + 2;
+            nextEpi = (int) ((diff / (86400 * 1000 * 7)) + 2);
             presentEpi = nextEpi - 1;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -283,7 +369,8 @@ public class LotteryService {
 
         map.put("nxt", nextEpi);
         map.put("present", presentEpi);
-        return Integer.parseInt(String.valueOf(presentEpi));
+        return map;
+//        return Integer.parseInt(String.valueOf(presentEpi));
 
     }
 
@@ -308,29 +395,36 @@ public class LotteryService {
         return lotteryMapper.seleteUnpackedSuggestionList();
     }
 
-    public String getSuggestionNumberReplyById(int snid){
+    public String getReplyById(String type,int idx){
+
+        DreamStory ds = new DreamStory();
+        ds.setIdx(idx);
+        ds.setType(type);
+
+        List<DreamStory> replyList = lotteryMapper.getReplyById(ds);
+
         String html ="<div class=\"m-section\">\n" +
                 "<div class=\"m-section__content\">\n" +
                 "<!--begin::Preview-->\n" +
                 "<div class=\"m-demo\">\n" +
                 "<div class=\"m-demo__preview\">\n" +
                 "<div class=\"m-list-timeline\">\n";
-        List<DreamStory> replyList = lotteryMapper.getSuggestionNumberReplyById(snid);
+
+
 
         if(replyList.size() > 0){
-            for(DreamStory ds : replyList){
+            for(DreamStory drs : replyList){
                 html=html+"<div class=\"m-list-timeline__items\">\n" +
                         "<div class=\"m-list-timeline__item\">\n" +
                         "<span class=\"m-list-timeline__badge\"></span>\n" +
                         "<span class=\"m-list-timeline__text\">\n" +
-                        ds.getStory()+
+                        drs.getStory()+
                         "</span>\n" +
                         "<span class=\"m-list-timeline__time\">\n" +
-                        ds.getTimer()+
+                        drs.getTimer()+
                         "</span>\n" +
                         "</div>\n" +
                         "</div>\n";
-
             }
         }else{
             html=html+"<div class=\"m-list-timeline__items\">\n" +
@@ -352,25 +446,51 @@ public class LotteryService {
     }
 
 
-    public String getSuggestionNumberDetailHtml(int snid) {
-        DreamStory ds = lotteryMapper.getSuggestionById(snid);
-        //ds.setSnid(snid);
-        NumSet ns = lotteryMapper.getNumberSetById(ds);
-        List<DreamStory> history = lotteryMapper.getSimHistory(ds);
+    public String getSuggestionStoryDetail(int sid) {
+        DreamStory ds = lotteryMapper.getSuggestionById(sid);
 
         String html = "";
         html = html+"<div class=\"m-demo__preview\">\n" +
-                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\">\n" +
-                "<div class=\"m-stack__item m-stack__item--left\">\n" +
+
+                "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
+                "<div class=\"m-stack__item m-stack__item--center\">\n" +
                 "<div class=\"m-stack__demo-item\">\n" +
                 ds.getStory()+
                 "</div>\n" +
                 "</div>\n" +
                 "</div>"+
+                "<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
+                "<div class=\"input-group\">\n" +
+                "<input type=\"text\" class=\"form-control\" id=\"reptxt\" placeholder=\"Reply...\">\n" +
+                "<div class=\"input-group-append\">\n" +
+                "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep('s',"+ds.getIdx()+")\">\n" +
+                "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
+                "</button>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "</div>";
+
+        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getReplyById("s",ds.getIdx());
+
+        return html;
+    }
+
+
+    public String getSuggestionNumberDetailHtml(int nid) {
+        //DreamStory ds = lotteryMapper.getSuggestionById(nid);
+        //ds.setnid(nid);
+        DreamStory ds = new DreamStory();
+        ds.setSnid(nid);
+        NumSet ns = lotteryMapper.getNumberSetById(ds);
+        List<DreamStory> history = lotteryMapper.getSimHistory(ds);
+
+        String html = "";
+        html = html+"<div class=\"m-demo__preview\">\n" +
+
                 "<div class=\"m-stack m-stack--hor m-stack--general m-stack--demo\" style=\"height: 20px\">\n" +
                 "<div class=\"m-stack__item m-stack__item--center\">\n" +
                 "<div class=\"m-stack__demo-item\">\n" +
-                "<h6>추천번호</h6>"+ns.getNumberUnit()+
+                ns.getNumberUnit()+
                 "</div>\n" +
                 "</div>\n" +
                 "</div>"+
@@ -382,55 +502,166 @@ public class LotteryService {
                 "</div>\n" +
                 "<div class=\"m-stack__item m-stack__item--center m-stack__item--middle\">\n";
 
-                if(history.size() > 0){
-                    html = html+"<div style=\"overflow:scroll;height:200px;\">";
-                    for(DreamStory dream : history){
-                        html=html+"<div class=\"m-timeline-3__item m-timeline-3__item--info\"><span class=\"m-timeline-3__item-time\">"+dream.getDraw()+"</span><div class=\"m-timeline-3__item-desc\"><span class=\"m-timeline-3__item-text\">"+dream.getPlace()+"</span><br></div></div>";
-                    }
-                    html=html+"</div>";
-                }else{
-                    html=html+"<h6>당첨내역 없음</h6>";
-                }
+        html = getHistoryHtmlString(html, history, ns);
 
-                html=html+"</div>\n" +
-                "<div class=\"m-stack__item m-stack__item--center m-stack__item--bottom\">\n" +
-                "<h6>총 획득상금: "+ns.getTotalPrize()+"</h6>" +
-                "</div>\n" +
-                "</div>\n" +
-                "</div>";
-
-                html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
+        html=html+"<div class=\"form-group m-form__group\" style=\"margin-top:33px;\">\n" +
                         "<div class=\"input-group\">\n" +
-                        "<input type=\"text\" class=\"form-control\" id=\"numrep\" placeholder=\"Reply...\">\n" +
+                        "<input type=\"text\" class=\"form-control\" id=\"reptxt\" placeholder=\"Reply...\">\n" +
                         "<div class=\"input-group-append\">\n" +
-                        "<button class=\"btn btn-secondary\" type=\"button\" onclick=\"nrep("+ds.getSnid()+")\">\n" +
-                        "Go!\n" +
+                        "<button class=\"btn btn-secondary\" style=\"background-color:darkblue;\" type=\"button\" onclick=\"nrep('n',"+ds.getSnid()+")\">\n" +
+                        "<i class=\"flaticon-edit-1\" style=\"color:white;\"></i>" +
                         "</button>\n" +
                         "</div>\n" +
                         "</div>\n" +
                         "</div>";
 
-                        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getSuggestionNumberReplyById(ds.getSnid());
+                        html=html+"<div class=\"m-section\" id=\"drep\" style=\"height:200px; overflow:scroll; margin-top:33px;\">\n"+getReplyById("n",ds.getSnid());
 
 
 
         return html;
     }
 
-    public String postNumberSuggestionReply(int snid, String story) {
+    public String postNumberSuggestionReply(String type,int idx, String story) {
         DreamStory ds = new DreamStory();
         String code ="200";
         try{
+            ds.setType(type);
             ds.setStory(story.replaceAll("<","&lt;"));
-            ds.setSnid(snid);
+            ds.setIdx(idx);
 
-            lotteryMapper.postNumberSuggestionReply(ds);
+            lotteryMapper.postReply(ds);
         }catch (Exception e){
             code="999";
         }
         return code;
 
 
+    }
+
+
+    public String getDrawHistoryHtml(int draw) {
+        String html ="";
+        NumSet ns = new NumSet();
+        ns.setDraw(draw);
+        List<NumSet> drawHistory = lotteryMapper.getDrawHistory(ns);
+
+        for(NumSet dr : drawHistory){
+            html = html + "<div class=\"m-list-timeline__item\">\n" +
+                    "<span class=\"m-list-timeline__badge\"></span>\n" +
+                    "<span class=\"m-list-timeline__time\">\n" +
+                    dr.getDraw()+"회</br>"+dr.getDrawDate()+
+                    "</span>\n" +
+                    "<span class=\"m-list-timeline__badge\"></span>\n" +
+                    "<span class=\"m-list-timeline__text\" style\"font-size:22px;\">\n" +
+                    dr.getFirst()+" , "+dr.getSecond()+" , "+dr.getThird()+" , "+dr.getFourth()+" , "+dr.getFifth()+" , "+dr.getSixth()+"| 보너스: "+dr.getBonus()+
+                    "</span>\n" +
+                    "</div>";
+        }
+        return html;
+    }
+
+    public NumSet getDrawNumSet(int presentDraw) {
+        return lotteryMapper.getDrawNumSet(presentDraw);
+    }
+
+    public List<NumSet> getSuggestionNumSet(int presentDraw) {
+        List<NumSet> list = new ArrayList<>();
+        List<DreamStory> dsList = lotteryMapper.getTargetDrawSuggestion(presentDraw);
+
+        for(DreamStory ds:dsList){
+            NumSet ns = new NumSet();
+            stringToNumSet(ds, ns);
+            ns.setIdx(ds.getSnid());
+            list.add(ns);
+        }
+
+        return list;
+
+    }
+
+    private void stringToNumSet(DreamStory ds, NumSet ns) {
+        String[] digit = ds.getResult().split(",");
+        ns.setFirst(digit[0]);
+        ns.setSecond(digit[1]);
+        ns.setThird(digit[2]);
+        ns.setFourth(digit[3]);
+        ns.setFifth(digit[4]);
+        ns.setSixth(digit[5]);
+    }
+
+    public void insertWeeklyDrawResult(NumSet ns) {
+        lotteryMapper.insertWeeklyDrawResult(ns);
+    }
+
+    public String getWeeklyResult(int draw) {
+
+
+        if(draw == 0){
+            draw = this.getMaxDraw();
+        }
+        NumSet ns = lotteryMapper.getDrawNumSet(draw);
+        List<DreamStory> weeklyResult = lotteryMapper.getWeeklyResult(ns);
+
+        String html ="<div class=\"m-portlet\">\n" +
+                "<div class=\"m-portlet__head\">\n" +
+                "<div class=\"m-portlet__head-caption\">\n" +
+                "<div class=\"m-portlet__head-title\">\n" +
+                "<h3 class=\"m-portlet__head-text\">\n" +
+                ns.getDraw()+"회("+ns.getDrawDate()+") 결과"+
+                "</h3>\n" +
+//                "<div class=\"m-form__actions\">\n" +
+                "<select class=\"form-control\" id=\"wkld\" style=\"width: 60px;display: inline; margin-left:15px;\">\n";
+                for(int i = draw; 1 <= i; i--){
+                    html=html+"<option value=\""+i+"\">\n" +i+ "</option>\n";
+                }
+
+               html = html+
+                "</select>\n" +
+                "<button type=\"reset\" class=\"btn btn-primary\" onclick=\"javscript:wkll();\">\n" +
+                "\t조회\n" +
+                "</button>\n" +
+//                "</div>"+
+                "</div>\n" +
+                "</div>\n" +
+                "</div>\n" +
+                "<div class=\"m-portlet__body\">\n" +
+                "<div class=\"m-section\">\n" +
+
+                        "<div class=\"m-section__content\">\n" +
+                        "<table class=\"table\">\n" +
+                        "<thead>\n" +
+                        "<tr>\n" +
+                        "<th>\n" +
+                        "#\n" +
+                        "</th>\n" +
+                        "<th>\n" +
+                        "\tNumber\n" +
+                        "</th>\n" +
+                        "<th>\n" +
+                        "\tPrize\n" +
+                        "</th>\n" +
+                        "</tr>\n" +
+                        "</thead>\n" +
+                        "<tbody>\n";
+                        if(weeklyResult.size() == 0) {
+                            html = html + "<tr><td colspan=\"3\">당첨결과가 없습니다 ㅠㅠ</td></tr>";
+                        }else{
+                            for(DreamStory result:weeklyResult){
+                                html=html+"<tr><td>"+result.getPlace()+"등</td><td>"+result.getResult()+"</td><td>"+result.getPrize()+"원</td></tr>";
+                            }
+                        }
+
+                        html = html+"</tbody>\n" +
+                        "</table>\n" +
+                        "</div>\n" +
+                        "</div>"+
+                "</div>\n" +
+                "</div>";
+
+
+
+        return  html;
     }
 }
 

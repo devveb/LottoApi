@@ -19,8 +19,8 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/wtn")
     @ResponseBody
-    public String storyToNum(@RequestParam String story,@RequestParam int iss) {
-        return lotteryService.getWinNumbers(story,iss);
+    public String storyToNum(@RequestParam String story,@RequestParam int iss,@RequestParam int digit) {
+        return lotteryService.getWinNumbers(story,iss,digit);
     }
 
     /**
@@ -42,6 +42,7 @@ public class LotteryApiController {
     @PostMapping("/lm")
     @ResponseBody
     public String recentListAndModal(@RequestParam("p") int page) {
+
         return lotteryService.getListAndModal(page);
     }
 
@@ -53,8 +54,20 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/nd")
     @ResponseBody
-    public String getSuggestionNumberDetail(@RequestParam("snid") int snid) {
-        return lotteryService.getSuggestionNumberDetailHtml(snid);
+    public String getSuggestionNumberDetail(@RequestParam("nid") int nid) {
+        return lotteryService.getSuggestionNumberDetailHtml(nid);
+    }
+
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/sd")
+    @ResponseBody
+    public String getSuggestionStoryDetail(@RequestParam("sid") int sid) {
+        return lotteryService.getSuggestionStoryDetail(sid);
     }
 
     /**
@@ -62,10 +75,10 @@ public class LotteryApiController {
      * @return
      */
     @CrossOrigin
-    @PostMapping("/nrp")
+    @PostMapping("/rp")
     @ResponseBody
-    public String postNumberSuggestionReply(@RequestParam("i") int snid,@RequestParam("s") String story) {
-        return lotteryService.postNumberSuggestionReply(snid,story);
+    public String postReply(@RequestParam("t") String type,@RequestParam("i") int idx,@RequestParam("s") String story) {
+        return lotteryService.postNumberSuggestionReply(type,idx,story);
     }
 
 
@@ -76,8 +89,42 @@ public class LotteryApiController {
     @CrossOrigin
     @PostMapping("/drp")
     @ResponseBody
-    public String getSuggestionReply(@RequestParam("i") int snid) {
-        return lotteryService.getSuggestionNumberReplyById(snid);
+    public String getSuggestionReply(@RequestParam("t") String type,@RequestParam("i") int idx) {
+        return lotteryService.getReplyById(type,idx);
+    }
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/ch")
+    @ResponseBody
+    public String getWinHistoryAndNumberValue(@RequestParam("r") String result) {
+        return lotteryService.getWinHistoryAndNumberValue(result);
+    }
+
+    /**
+     * Dream to Number result list and detail modal
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/dh")
+    @ResponseBody
+    public String getDrawHistoryHtml(@RequestParam("d") int draw) {
+        return lotteryService.getDrawHistoryHtml(draw);
+    }
+
+
+    /**
+     * get weekly result
+     * @return
+     */
+    @CrossOrigin
+    @PostMapping("/wkl")
+    @ResponseBody
+    public String getWeeklyResult(@RequestParam("d") int draw) {
+        return lotteryService.getWeeklyResult(draw);
     }
 
 

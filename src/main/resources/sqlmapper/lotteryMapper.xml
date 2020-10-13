@@ -41,7 +41,7 @@
     </insert>
 
     <insert id="insertDreamResult" parameterType="DreamStory" useGeneratedKeys="true" keyProperty="idx" keyColumn="idx">
-        insert into wslt.lotto_suggestions(story,snid,isShow) VALUES (#{story},#{snid},#{iss})
+        insert into wslt.lotto_suggestions(story,snid,isShow,targetDraw) VALUES (#{story},#{snid},#{iss},#{targetDraw})
 
     </insert>
 
@@ -78,12 +78,12 @@
             on sug.snid = num.idx
             where isShow = 1
             order by idx desc
-                limit ${_parameter},5
+                limit ${_parameter},7
             ) tmp
 
     </select>
 
-    <select id="selectDreamNumber" resultType="String" parameterType="String">
+    <select id="selectDreamNumber" resultType="String" parameterType="DreamStory">
         select GROUP_CONCAT(num) from (
                                           select num,sum(count) as sc from (
                                                                                SELECT
@@ -100,12 +100,29 @@
                                                                            ) tmp
                                           group by num
                                           order by sc desc
-                                          limit 6
+                                          limit #{digit}
                                       ) tmp2
     </select>
 
-    <select id="getDrawHistory" resultType="NumSet">
-        select draw,first,second,third,fourth,fifth,sixth,bonus,first_prize as firstPrize,second_prize as secondPrize, third_prize as thirdPrize ,draw_date from wslt.lotto_draw_history
+    <select id="getDrawHistory" resultType="NumSet" parameterType="NumSet">
+        SELECT draw,
+               first,
+               second,
+               third,
+               fourth,
+               fifth,
+               sixth,
+               bonus,
+               first_prize  AS firstPrize,
+               second_prize AS secondPrize,
+               third_prize  AS thirdPrize,
+               fourth_prize  AS fourthPrize,
+               draw_date
+        FROM   wslt.lotto_draw_history
+        <if test="draw != 0">
+            where draw = #{draw}
+        </if>
+        order by draw desc
     </select>
 
     <insert id="insertDrawSimulation" parameterType="NumSet">
@@ -184,30 +201,41 @@
     </select>
 
     <select id="getSimHistory" parameterType="DreamStory" resultType="DreamStory">
-        select
+        select distinct
             idx
-            ,nid as snid
-            ,draw
-            ,place
-            ,sug_date as sugDate
-            ,draw_date as drawDate
-            ,reg_date as regDate
+                      ,nid as snid
+                      ,sim.draw
+                      ,place
+                      ,his.first_prize as firstPrizeInt
+                      ,his.second_prize as secondPrizeInt
+                      ,his.third_prize as thirdPrizeInt
+                      ,his.fourth_prize as fourthPrizeInt
+                      ,sim.draw_date as drawDate
+                      ,sim.reg_date as regDate
         from
-            wslt.lotto_draw_simmulation
+            wslt.lotto_draw_simmulation sim
+                left outer join wslt.lotto_draw_history his
+                                on sim.draw = his.draw
         where
             nid = #{snid}
+        group by nid,draw
+        order by draw desc
     </select>
 
-    <insert id="postNumberSuggestionReply" parameterType="DreamStory">
-        insert into wslt.lotto_suggestion_reply(snid,rep) values (#{snid},#{story})
+    <insert id="postReply" parameterType="DreamStory">
+        <if test='type == "n"'>
+            insert into wslt.lotto_suggestion_reply(snid,rep) values (#{idx},#{story})
+        </if>
+        <if test='type== "s"'>
+            insert into wslt.lotto_story_reply(sid,rep) values (#{idx},#{story})
+        </if>
     </insert>
 
-    <select id="getSuggestionNumberReplyById" parameterType="int" resultType="DreamStory">
+    <select id="getReplyById" parameterType="DreamStory" resultType="DreamStory">
         select
-            snid
+            idx
              , <![CDATA[replace(rep,'<','&lt;') as story ]]>
              , regd
-
         <![CDATA[
              ,CASE
                   WHEN td < 60 THEN 'now'
@@ -222,19 +250,78 @@
 
 
         select
-            snid
-             ,rep
+        <if test= 'type == "n"'>
+            snid as idx
+        </if>
+        <if test= 'type == "s"'>
+            sid as idx
+        </if>
+        ,rep
              , date_format(reg_date, '%Y-%m-%d %H:%i') as regd
              , TIMESTAMPDIFF(SECOND, reg_date, now())  as td
-        from wslt.lotto_suggestion_reply
-        where snid = #{_parameter}
+        <if test='type == "n"'>
+            from wslt.lotto_suggestion_reply
+            where snid = #{idx}
+        </if>
+        <if test='type == "s"'>
+            from wslt.lotto_story_reply
+            where sid = #{idx}
+        </if>
+        and iss = 1
         order by reg_date desc
         ) tmp
+    </select>
+
+    <select id="getReplyCnt" parameterType="DreamStory" resultType="int">
+        select count(*) as cnt
+        <if test='type == "n"'>
+            from wslt.lotto_suggestion_reply
+            where snid = #{idx}
+        </if>
+        <if test='type == "s"'>
+            from wslt.lotto_story_reply
+            where sid = #{idx}
+        </if>
+            and iss = 1
+
     </select>
 
     <select id="getSuggestionById" parameterType="int" resultType="DreamStory">
         select idx,story,snid,result,isShow as iss,regd as regDate from lotto_suggestions
         where idx = #{_parameter}
+    </select>
+
+    <select id="getDrawNumSet" parameterType="int" resultType="NumSet">
+        select draw,first,second,third,fourth,fifth,sixth,bonus,draw_date as drawDate from wslt.lotto_draw_history
+        where draw =#{_parameter}
+    </select>
+
+    <select id="getTargetDrawSuggestion" parameterType="int" resultType="DreamStory">
+        select snm.number_set as result, snm.idx as snid from wslt.lotto_suggestions sug
+        left join wslt.lotto_suggestion_numset snm
+        on sug.snid = snm.idx
+        where sug.targetDraw = #{_parameter}
+    </select>
+
+    <insert id="insertWeeklyDrawResult" parameterType="NumSet">
+        insert into wslt.lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx})
+    </insert>
+
+    <select id="getWeeklyResult" parameterType="NumSet" resultType="DreamStory">
+        select
+             draw
+             ,place
+             ,stake as prize
+             ,number_set as result
+             ,snid
+        from
+             lotto_weekly_draw_history wdh
+        left join
+             lotto_suggestion_numset snm
+        on
+            wdh.snid = snm.idx
+        where
+              draw = #{draw}
     </select>
 
 </mapper>

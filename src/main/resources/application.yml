@@ -5,11 +5,11 @@ server:
 
 spring:
     profiles:
-        active: home
+        active: dep
 
 mybatis:
     mapper-locations: classpath*:sqlmapper/*.xml
-    type-aliases-package: com.sbsft.wslapi.domain
+    type-aliases-package: com.sbsft.wslapi.model
     configuration:
         map-underscore-to-camel-case: true
         default-fetch-size: 20

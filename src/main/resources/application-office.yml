@@ -1,6 +1,6 @@
 spring:
     datasource:
-        url: jdbc:mariadb://devveb.hopto.org:3306/statistics-local?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
+        url: jdbc:mariadb://devveb.hopto.org:33061/wslt?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
         driver-class-name: org.mariadb.jdbc.Driver
         username: yapdev
         password:

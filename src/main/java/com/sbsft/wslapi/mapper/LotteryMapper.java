@@ -16,13 +16,13 @@ public interface LotteryMapper {
 
     void insertDrawHistory(NumSet ns);
 
-    String selectDreamNumber(String textCheck);
+    String selectDreamNumber(DreamStory ds);
 
-    void insertDreamResult(DreamStory ds);
+    void insertDreamResult (DreamStory ds);
 
     List<DreamStory> selectDreamResultList(int page);
 
-    List<NumSet> getDrawHistory();
+    List<NumSet> getDrawHistory(NumSet draw);
 
     void insertDrawSimulation(NumSet dreamnum);
 
@@ -44,9 +44,19 @@ public interface LotteryMapper {
 
     List<DreamStory> getSimHistory(DreamStory ds);
 
-    void postNumberSuggestionReply(DreamStory ds);
+    void postReply(DreamStory ds);
 
-    List<DreamStory> getSuggestionNumberReplyById(int snid);
+    List<DreamStory> getReplyById(DreamStory ds);
 
     DreamStory getSuggestionById(int snid);
+
+    int getReplyCnt(DreamStory ds);
+
+    NumSet getDrawNumSet(int presentDraw);
+
+    List<DreamStory> getTargetDrawSuggestion(int presentDraw);
+
+    void insertWeeklyDrawResult(NumSet ns);
+
+    List<DreamStory> getWeeklyResult(NumSet ns);
 }

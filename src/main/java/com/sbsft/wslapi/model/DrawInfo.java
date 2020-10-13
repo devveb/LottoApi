@@ -26,11 +26,19 @@ public class DrawInfo {
     private String fourthPrize;
     private String fifthPrize;
 
+    private long firstPrizeInt;
+    private long secondPrizeInt;
+    private long thirdPrizeInt;
+    private int fourthPrizeInt;
+    private int fifthPrizeInt;
+
     private int place;
     private String pickDate;
     private String drawDate;
     private String sugDate;
     private String regDate;
+
+    private String type;
 
     private int sugCount;
 
