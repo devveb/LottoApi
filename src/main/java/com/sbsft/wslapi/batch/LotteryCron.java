@@ -14,14 +14,14 @@ public class LotteryCron {
     @Autowired
     LotteryService lotteryService;
 
-    @Scheduled(cron = "0 0 21 * * sat")
+
+    @Scheduled(cron = "0 0 21 * * SAT")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // TODO: 2020/08/20
         // 1. get last draw and present draw num
         // 2. get draw result and insert
-
-        int maxDraw = lotteryService.getMaxDraw();
+        int maxDraw = lotteryService.getMaxDraw(); /* get latest draw from history */
         int presentDraw = lotteryService.getPresentDraw().get("nxt");
         if(maxDraw < presentDraw){
             for(int i = maxDraw+1;i<presentDraw;i++ ){
@@ -31,7 +31,7 @@ public class LotteryCron {
         }
     }
 
-    @Scheduled(cron = "0 10 21 * * sat")
+    @Scheduled(cron = "10 10 21 * * SAT")
 //    @Scheduled(cron = "10 * * * * mon")
     private void getTargetDraw(){
         // TODO: 2020/08/20
