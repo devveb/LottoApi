@@ -541,10 +541,12 @@ public class LotteryService {
 
 
     public String getDrawHistoryHtml(int draw) {
+        this.getWeeklyWinningNumbers();
         String html ="";
         NumSet ns = new NumSet();
         ns.setDraw(draw);
         List<NumSet> drawHistory = lotteryMapper.getDrawHistory(ns);
+
 
         for(NumSet dr : drawHistory){
             html = html + "<div class=\"m-list-timeline__item\">\n" +
@@ -600,6 +602,7 @@ public class LotteryService {
         if(draw == 0){
             draw = this.getMaxDraw();
         }
+        this.getWeeklyWinResult();
         NumSet ns = lotteryMapper.getDrawNumSet(draw);
         List<DreamStory> weeklyResult = lotteryMapper.getWeeklyResult(ns);
 
@@ -662,6 +665,45 @@ public class LotteryService {
 
 
         return  html;
+    }
+
+    public void getWeeklyWinningNumbers() {
+        int maxDraw = this.getMaxDraw(); /* get latest draw from history */
+        int presentDraw = this.getPresentDraw().get("nxt");
+        if(maxDraw < presentDraw){
+            for(int i = maxDraw+1;i<presentDraw;i++ ){
+                NumSet ns = this.callWinNumApi(i);
+                this.insertDrawHistory(ns);
+            }
+        }
+    }
+
+    public void getWeeklyWinResult() {
+
+            int presentDraw = this.getPresentDraw().get("present");
+            NumSet thisWeekPickNumSet = this.getDrawNumSet(presentDraw);
+            List<NumSet> thisWeekSuggestionNumSet = this.getSuggestionNumSet(presentDraw);
+
+            for(NumSet ns :thisWeekSuggestionNumSet){
+                int place = this.winChecker(thisWeekPickNumSet,ns);
+                if(place <= 5){
+                    ns.setPlace(place);
+                    ns.setDraw(presentDraw);
+                    if(place == 1){
+                        ns.setPrize(ns.getFifthPrize());
+                    }else if(place == 2){
+                        ns.setPrize(ns.getSecondPrize());
+                    }else if(place == 3){
+                        ns.setPrize(ns.getThirdPrize());
+                    }else if(place == 4){
+                        ns.setPrize(ns.getFourthPrize());
+                    }else{
+                        ns.setPrize("5000");
+                    }
+                    this.insertWeeklyDrawResult(ns);
+                }
+            }
+
     }
 }
 
