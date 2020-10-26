@@ -556,7 +556,7 @@ public class LotteryService {
                     "</span>\n" +
                     "<span class=\"m-list-timeline__badge\"></span>\n" +
                     "<span class=\"m-list-timeline__text\" style\"font-size:22px;\">\n" +
-                    dr.getFirst()+" , "+dr.getSecond()+" , "+dr.getThird()+" , "+dr.getFourth()+" , "+dr.getFifth()+" , "+dr.getSixth()+"| 보너스: "+dr.getBonus()+
+                    dr.getFirst()+" , "+dr.getSecond()+" , "+dr.getThird()+" , "+dr.getFourth()+" , "+dr.getFifth()+" , "+dr.getSixth()+" + 보너스: "+dr.getBonus()+
                     "</span>\n" +
                     "</div>";
         }
@@ -609,11 +609,11 @@ public class LotteryService {
         String html ="<div class=\"m-portlet\">\n" +
                 "<div class=\"m-portlet__head\">\n" +
                 "<div class=\"m-portlet__head-caption\">\n" +
-                "<div class=\"m-portlet__head-title\">\n" +
+                "<div class=\"m-portlet__head-title\" style=\"width:110%;\">\n" +
                 "<h3 class=\"m-portlet__head-text\">\n" +
-                ns.getDraw()+"회("+ns.getDrawDate()+") 결과"+
+                ns.getDraw()+"회 추첨일: "+ns.getDrawDate()+
                 "</h3>\n" +
-//                "<div class=\"m-form__actions\">\n" +
+                "<div style=\"margin-top:18px; margin-right:30px; float:right;\">\n" +
                 "<select class=\"form-control\" id=\"wkld\" style=\"width: 60px;display: inline; margin-left:15px;\">\n";
                 for(int i = draw; 1 <= i; i--){
                     html=html+"<option value=\""+i+"\">\n" +i+ "</option>\n";
@@ -624,7 +624,7 @@ public class LotteryService {
                 "<button type=\"reset\" class=\"btn btn-primary\" onclick=\"javscript:wkll();\">\n" +
                 "\t조회\n" +
                 "</button>\n" +
-//                "</div>"+
+                "</div>"+
                 "</div>\n" +
                 "</div>\n" +
                 "</div>\n" +
@@ -648,7 +648,7 @@ public class LotteryService {
                         "</thead>\n" +
                         "<tbody>\n";
                         if(weeklyResult.size() == 0) {
-                            html = html + "<tr><td colspan=\"3\">당첨결과가 없습니다 ㅠㅠ</td></tr>";
+                            html = html + "<tr><td colspan=\"3\" style=\"text-align:center;\">당첨결과가 없습니다 ㅠㅠ</td></tr>";
                         }else{
                             for(DreamStory result:weeklyResult){
                                 html=html+"<tr><td>"+result.getPlace()+"등</td><td>"+result.getResult()+"</td><td>"+result.getPrize()+"원</td></tr>";

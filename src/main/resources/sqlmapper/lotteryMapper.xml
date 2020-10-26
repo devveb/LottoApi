@@ -301,6 +301,10 @@
         left join wslt.lotto_suggestion_numset snm
         on sug.snid = snm.idx
         where sug.targetDraw = #{_parameter}
+        and isCheck = 0;
+
+        update wslt.lotto_suggestions set isCheck = 1
+        where targetDraw = #{_parameter};
     </select>
 
     <insert id="insertWeeklyDrawResult" parameterType="NumSet">
