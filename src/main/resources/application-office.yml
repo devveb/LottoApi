@@ -1,18 +1,6 @@
 spring:
     datasource:
-        url: jdbc:mariadb://devveb.hopto.org:33061/wslt?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
-        driver-class-name: org.mariadb.jdbc.Driver
         username: yapdev
-        password:
-
-
-
-
-
-
-
-
-
-
-
-
+        url: jdbc:mariadb://172.16.3.36:3306/statistics-local?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
+        driver-class-name: org.mariadb.jdbc.Driver
+        password: 8860f9e978#eee0T312c7b43

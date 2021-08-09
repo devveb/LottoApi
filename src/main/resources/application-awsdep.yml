@@ -1,0 +1,6 @@
+spring:
+    datasource:
+        username: dbmasteruser
+        url: jdbc:mariadb://ls-248c744ecbe81e55e5e609dfacaca32384855113.crivu1xbeche.ap-northeast-2.rds.amazonaws.com:3306/db_lotto?zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&autoReconnect=true&useSSL=false&useTimezone=true&serverTimezone=Asia/Seoul
+        driver-class-name: org.mariadb.jdbc.Driver
+        password: _G>vg8cuGiV%.4>:>jgsVyMc]IVx}Zd7
