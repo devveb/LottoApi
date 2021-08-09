@@ -12,7 +12,7 @@ public class LotteryCron {
     LotteryService lotteryService;
 
 
-    @Scheduled(cron = "0 0 21 * * SAT")
+    @Scheduled(cron = "30 14 * * * *")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // TODO: 2020/08/20
@@ -23,13 +23,13 @@ public class LotteryCron {
 
 
 
-    @Scheduled(cron = "10 10 21 * * SAT")
+    @Scheduled(cron = "30 * * * * *")
 //    @Scheduled(cron = "10 * * * * mon")
     private void getTargetDraw(){
         // TODO: 2020/08/20
         // 1. get last draw and present draw num
         // 2. get draw result and insert
-        lotteryService.getWeeklyWinResult();
+        lotteryService.getWeeklyWinResult(0);
 
 
     }

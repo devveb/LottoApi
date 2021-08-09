@@ -4,16 +4,3 @@ spring:
         driver-class-name: org.mariadb.jdbc.Driver
         username: devtaek
         password:
-
-
-
-
-
-
-
-
-
-
-
-
-

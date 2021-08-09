@@ -26,21 +26,25 @@ public class LotteryService {
     private DtnUtil dtnUtil;
 
     public String getWinNumbers(String story, int iss , int digit) {
-
+        String result = null;
         DreamStory ds = new DreamStory();
         ds.setStory(dtnUtil.textCheck(story));
         ds.setDigit(digit);
+        try{
+            result = lotteryMapper.selectDreamNumber(ds);
 
-        String result = lotteryMapper.selectDreamNumber(ds);
+            ds.setStory(story);
+            ds.setResult(result);
+            ds.setIss(iss);
 
-        ds.setStory(story);
-        ds.setResult(result);
-        ds.setIss(iss);
+            getNumberSet(ds);
+            ds.setTargetDraw((long) this.getPresentDraw().get("nxt"));
+            lotteryMapper.insertDreamResult(ds);
+            checkHistory(ds);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-        getNumberSet(ds);
-        ds.setTargetDraw((long) this.getPresentDraw().get("nxt"));
-        lotteryMapper.insertDreamResult(ds);
-        checkHistory(ds);
 
         return result;
     }
@@ -602,7 +606,9 @@ public class LotteryService {
         if(draw == 0){
             draw = this.getMaxDraw();
         }
-        this.getWeeklyWinResult();
+
+        int maxDraw = lotteryMapper.getMaxDraw();
+        this.getWeeklyWinResult(draw);
         NumSet ns = lotteryMapper.getDrawNumSet(draw);
         List<DreamStory> weeklyResult = lotteryMapper.getWeeklyResult(ns);
 
@@ -615,8 +621,10 @@ public class LotteryService {
                 "</h3>\n" +
                 "<div style=\"margin-top:18px; margin-right:30px; float:right;\">\n" +
                 "<select class=\"form-control\" id=\"wkld\" style=\"width: 60px;display: inline; margin-left:15px;\">\n";
-                for(int i = draw; 1 <= i; i--){
-                    html=html+"<option value=\""+i+"\">\n" +i+ "</option>\n";
+                for(int i = maxDraw; 1 <= i; i--){
+                    html=html+"<option value=\""+i+"\"";
+                    if(i == draw) html=html+"selected=\"selected\"";
+                    html=html+">" +i+ "</option>\n";
                 }
 
                html = html+
@@ -648,7 +656,7 @@ public class LotteryService {
                         "</thead>\n" +
                         "<tbody>\n";
                         if(weeklyResult.size() == 0) {
-                            html = html + "<tr><td colspan=\"3\" style=\"text-align:center;\">당첨결과가 없습니다 ㅠㅠ</td></tr>";
+                            html = html + "<tr><td colspan=\"3\" style=\"text-align:center;\">당첨결과가 없습니다.</td></tr>";
                         }else{
                             for(DreamStory result:weeklyResult){
                                 html=html+"<tr><td>"+result.getPlace()+"등</td><td>"+result.getResult()+"</td><td>"+result.getPrize()+"원</td></tr>";
@@ -678,9 +686,16 @@ public class LotteryService {
         }
     }
 
-    public void getWeeklyWinResult() {
+    public void getWeeklyWinResult(int draw) {
 
-            int presentDraw = this.getPresentDraw().get("present");
+        int presentDraw=0;
+
+            if(draw == 0){
+                presentDraw = this.getPresentDraw().get("present");
+            }else{
+                presentDraw = draw;
+            }
+
             NumSet thisWeekPickNumSet = this.getDrawNumSet(presentDraw);
             List<NumSet> thisWeekSuggestionNumSet = this.getSuggestionNumSet(presentDraw);
 
