@@ -15,20 +15,16 @@ public class LotteryCron {
     @Scheduled(cron = "30 14 * * * *")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
-        // TODO: 2020/08/20
-        // 1. get last draw and present draw num
-        // 2. get draw result and insert
+        // 당첨번호 수집
         lotteryService.getWeeklyWinningNumbers();
     }
 
 
 
-    @Scheduled(cron = "30 * * * * *")
+    @Scheduled(cron = "30 15 * * * *")
 //    @Scheduled(cron = "10 * * * * mon")
     private void getTargetDraw(){
-        // TODO: 2020/08/20
-        // 1. get last draw and present draw num
-        // 2. get draw result and insert
+        // 당첨 여부 조회
         lotteryService.getWeeklyWinResult(0);
 
 

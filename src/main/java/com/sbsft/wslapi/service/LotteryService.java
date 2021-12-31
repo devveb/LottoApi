@@ -353,6 +353,7 @@ public class LotteryService {
     }
 
     public Map<String, Integer> getPresentDraw() {
+
         String standardDate = "2002-12-07 23:59:59";
         int nextEpi = 0;
         int presentEpi = 0;
@@ -572,6 +573,7 @@ public class LotteryService {
     }
 
     public List<NumSet> getSuggestionNumSet(int presentDraw) {
+
         List<NumSet> list = new ArrayList<>();
         List<DreamStory> dsList = lotteryMapper.getTargetDrawSuggestion(presentDraw);
 
@@ -691,15 +693,18 @@ public class LotteryService {
         int presentDraw=0;
 
             if(draw == 0){
-                presentDraw = this.getPresentDraw().get("present");
+                presentDraw = getPresentDraw().get("present");
             }else{
                 presentDraw = draw;
             }
 
-            NumSet thisWeekPickNumSet = this.getDrawNumSet(presentDraw);
-            List<NumSet> thisWeekSuggestionNumSet = this.getSuggestionNumSet(presentDraw);
+            //이번 주 당첨 번호
+            NumSet thisWeekPickNumSet = getDrawNumSet(presentDraw);
+            //이번 주에 추천된 번호들
+            List<NumSet> thisWeekSuggestionNumSet = getSuggestionNumSet(presentDraw);
 
-            for(NumSet ns :thisWeekSuggestionNumSet){
+            for(NumSet ns : thisWeekSuggestionNumSet){
+
                 int place = this.winChecker(thisWeekPickNumSet,ns);
                 if(place <= 5){
                     ns.setPlace(place);

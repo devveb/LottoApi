@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sbsft.wslapi.mapper.LotteryMapper">
-    <insert id="insertWinningNumbers" parameterType="NumSet">
 
-    </insert>
 
     <select id="getMaxDraw" resultType="int">
         select ifnull(max(draw),0) as draw from lotto_draw_history
@@ -301,10 +299,7 @@
         left join lotto_suggestion_numset snm
         on sug.snid = snm.idx
         where sug.targetDraw = #{_parameter}
-        and isCheck = 0;
-
-        update lotto_suggestions set isCheck = 1
-        where targetDraw = #{_parameter};
+        and isCheck = 0
     </select>
 
     <insert id="insertWeeklyDrawResult" parameterType="NumSet">
