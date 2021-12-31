@@ -1,5 +1,6 @@
 package com.sbsft.wslapi.mapper;
 
+import com.sbsft.wslapi.model.DrawInfo;
 import com.sbsft.wslapi.model.DreamStory;
 import com.sbsft.wslapi.model.NumSet;
 import org.apache.ibatis.annotations.Mapper;
@@ -59,4 +60,8 @@ public interface LotteryMapper {
     void insertWeeklyDrawResult(NumSet ns);
 
     List<DreamStory> getWeeklyResult(NumSet ns);
+
+    List<DrawInfo> getUnIdentifiedEpis(DrawInfo di);
+
+    void insertAutoReplyResult(NumSet ns);
 }

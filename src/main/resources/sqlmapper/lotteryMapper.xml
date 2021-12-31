@@ -303,7 +303,18 @@
     </select>
 
     <insert id="insertWeeklyDrawResult" parameterType="NumSet">
-        insert into lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx})
+        insert into lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx});
+        update lotto_suggestions set result = #{place}, isCheck = 1 where snid = #{idx};
+    </insert>
+
+    <select id="getUnIdentifiedEpis" parameterType="DrawInfo" resultType="DrawInfo">
+    <![CDATA[
+        select distinct targetDraw as draw from lotto_suggestions where isCheck = 0 and targetDraw  <= #{draw}
+        ]]>
+    </select>
+
+    <insert id="insertAutoReplyResult" parameterType="NumSet">
+        insert into lotto_suggestion_reply(snid,rep,iss,reg_date) values(#{idx},concat(#{place},'등 당첨!'),1,now());
     </insert>
 
     <select id="getWeeklyResult" parameterType="NumSet" resultType="DreamStory">

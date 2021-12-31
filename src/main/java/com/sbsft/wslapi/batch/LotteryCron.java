@@ -12,7 +12,7 @@ public class LotteryCron {
     LotteryService lotteryService;
 
 
-    @Scheduled(cron = "30 14 * * * *")
+    @Scheduled(cron = "0 21 * * * *")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // 당첨번호 수집
@@ -21,14 +21,20 @@ public class LotteryCron {
 
 
 
-    @Scheduled(cron = "30 15 * * * *")
-//    @Scheduled(cron = "10 * * * * mon")
-    private void getTargetDraw(){
-        // 당첨 여부 조회
-        lotteryService.getWeeklyWinResult(0);
+//    @Scheduled(cron = "30 * * * * *")
+//    private void getThisWeekWinResult(){
+//        // 당첨 여부 조회
+//        lotteryService.getWeeklyWinResult(0);
+//    }
 
-
+    @Scheduled(cron = "5 21 * * * *")
+    private void getPastWeekWinResult(){
+        // 이전 주 당첨 여부 업데이트
+        lotteryService.getPastWeeklyWinResult();
     }
+
+
+
 
 
 

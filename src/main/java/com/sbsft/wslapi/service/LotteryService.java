@@ -1,6 +1,7 @@
 package com.sbsft.wslapi.service;
 
 import com.sbsft.wslapi.mapper.LotteryMapper;
+import com.sbsft.wslapi.model.DrawInfo;
 import com.sbsft.wslapi.model.DreamStory;
 import com.sbsft.wslapi.model.NumSet;
 import com.sbsft.wslapi.utils.DtnUtil;
@@ -161,7 +162,7 @@ public class LotteryService {
                     totalPrize += Long.parseLong(historyNum.getThirdPrize());
                 }else if(place == 4) {
                     totalPrize += Long.parseLong(historyNum.getFourthPrize());
-                }else {
+                }else if(place == 5){
                     totalPrize += 5000;
                 }
 
@@ -706,9 +707,10 @@ public class LotteryService {
             for(NumSet ns : thisWeekSuggestionNumSet){
 
                 int place = this.winChecker(thisWeekPickNumSet,ns);
+                ns.setPlace(place);
+                ns.setDraw(presentDraw);
+
                 if(place <= 5){
-                    ns.setPlace(place);
-                    ns.setDraw(presentDraw);
                     if(place == 1){
                         ns.setPrize(ns.getFifthPrize());
                     }else if(place == 2){
@@ -717,13 +719,32 @@ public class LotteryService {
                         ns.setPrize(ns.getThirdPrize());
                     }else if(place == 4){
                         ns.setPrize(ns.getFourthPrize());
-                    }else{
+                    }else if(place == 5){
                         ns.setPrize("5000");
                     }
-                    this.insertWeeklyDrawResult(ns);
+
+                }else{
+                    ns.setPrize("0");
                 }
+
+                this.insertWeeklyDrawResult(ns);
+                lotteryMapper.insertAutoReplyResult(ns);
             }
 
+    }
+
+    public void getPastWeeklyWinResult() {
+        //기준 회차
+        DrawInfo di = new DrawInfo();
+        di.setDraw(getPresentDraw().get("present"));
+
+
+        // 당첨확인 안한 회차 리스트
+        List<DrawInfo> unIdentifiedEpi = lotteryMapper.getUnIdentifiedEpis(di);
+
+        for(DrawInfo  draw : unIdentifiedEpi){
+            getWeeklyWinResult(draw.getDraw());
+        }
     }
 }
 
