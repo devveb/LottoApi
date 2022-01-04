@@ -12,13 +12,12 @@ public class LotteryCron {
     LotteryService lotteryService;
 
 
-    @Scheduled(cron = "0 21 * * * *")
+    @Scheduled(cron = "0 21 * * * SAT")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // 당첨번호 수집
         lotteryService.getWeeklyWinningNumbers();
     }
-
 
 
 //    @Scheduled(cron = "30 * * * * *")

@@ -11,14 +11,16 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/api")
-public class ApiController {
+public class NamingApiController {
 
     private final AppService appService;
 
-    public ApiController(AppService appService) {
+    public NamingApiController(AppService appService) {
         this.appService = appService;
     }
-
+    /*
+    * Controller for Naming slot machine(Wordman:wordman.kickit.top)
+    * */
 
     @CrossOrigin
     @PostMapping("/save")
