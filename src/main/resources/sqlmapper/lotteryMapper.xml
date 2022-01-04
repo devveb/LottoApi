@@ -334,4 +334,15 @@
               draw = #{draw}
     </select>
 
+    <select id="getList" resultType="DreamStory" parameterType="Paging">
+        select
+            LTRIM(substr(story,1,25)) as story
+            , date_format(regd, '%Y-%m-%d %H:%i') as regDate
+        from
+            lotto_suggestions
+        where isShow = 1
+        order by regd desc
+        limit #{currentPageNo},#{recordsPerPage}
+    </select>
+
 </mapper>

@@ -3,6 +3,7 @@ package com.sbsft.wslapi.mapper;
 import com.sbsft.wslapi.model.DrawInfo;
 import com.sbsft.wslapi.model.DreamStory;
 import com.sbsft.wslapi.model.NumSet;
+import com.sbsft.wslapi.model.Paging;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -64,4 +65,6 @@ public interface LotteryMapper {
     List<DrawInfo> getUnIdentifiedEpis(DrawInfo di);
 
     void insertAutoReplyResult(NumSet ns);
+
+    List<DreamStory> getList(Paging paging);
 }

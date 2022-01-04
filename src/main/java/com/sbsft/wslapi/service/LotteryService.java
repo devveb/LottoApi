@@ -4,6 +4,7 @@ import com.sbsft.wslapi.mapper.LotteryMapper;
 import com.sbsft.wslapi.model.DrawInfo;
 import com.sbsft.wslapi.model.DreamStory;
 import com.sbsft.wslapi.model.NumSet;
+import com.sbsft.wslapi.model.Paging;
 import com.sbsft.wslapi.utils.DtnUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,6 +12,7 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -745,6 +747,12 @@ public class LotteryService {
         for(DrawInfo  draw : unIdentifiedEpi){
             getWeeklyWinResult(draw.getDraw());
         }
+    }
+
+    public List<DreamStory> getList(Map<String,Object> req) {
+        Paging paging = new Paging(1,"2");
+        List<DreamStory> list = lotteryMapper.getList(paging);
+        return list;
     }
 }
 

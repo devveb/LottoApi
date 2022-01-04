@@ -14,6 +14,7 @@ public class DreamStory extends DrawInfo {
     private long targetDraw;
     private String prize;
     private int snid;
+    private String regDate;
 
 
 }

@@ -6,6 +6,8 @@ server:
 spring:
     profiles:
         active: awsdep
+    mvc:
+        static-path-pattern: /static/**
 
 mybatis:
     mapper-locations: classpath*:sqlmapper/*.xml
@@ -14,3 +16,4 @@ mybatis:
         map-underscore-to-camel-case: true
         default-fetch-size: 20
         default-statement-timeout: 30
+
