@@ -11,6 +11,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import sun.jvm.hotspot.debugger.Page;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -749,9 +751,13 @@ public class LotteryService {
         }
     }
 
-    public List<DreamStory> getList(Map<String,Object> req) {
-        Paging paging = new Paging(1,"2");
-        List<DreamStory> list = lotteryMapper.getList(paging);
+    public List<DreamStory> getList(Model model, Paging page) {
+
+        int totalRecord = lotteryMapper.getTotalPage();
+        page.setTotalPages(totalRecord);
+        List<DreamStory> list = lotteryMapper.getList(page);
+
+
         return list;
     }
 }

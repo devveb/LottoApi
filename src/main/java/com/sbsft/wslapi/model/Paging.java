@@ -14,11 +14,15 @@ public class Paging {
     /** 화면 하단에 출력할 페이지 사이즈 */
     private int pageSize;
 
-    /** 검색 키워드 */
-    private String searchKeyword;
+    /** 총 페이지 수 **/
+    private int totalPages;
 
-    /** 검색 유형 */
-    private String searchType;
+    /** present page block **/
+    private int presentPageBlock;
+    private int presentPageBlockStart;
+    private int presentPageBlockEnd;
+
+
 
     public Paging() {
         this.currentPageNo = 1;
@@ -26,14 +30,30 @@ public class Paging {
         this.pageSize = 10;
     }
 
-    public Paging(int currentPageNo,String searchType){
+    public Paging(int currentPageNo){
         this.currentPageNo = currentPageNo;
-        this.searchType = searchType;
         this.recordsPerPage = 30;
         this.pageSize = 10;
+        this.presentPageBlock = currentPageNo/pageSize;
+        this.presentPageBlockStart = presentPageBlock * pageSize;
+
+
     }
+
+
 
     public int getStartPage() {
         return (currentPageNo - 1) * recordsPerPage;
     }
+
+    public void setTotalPages(int totalRecord) {
+
+        this.totalPages = totalRecord/this.recordsPerPage+1;
+        this.presentPageBlockEnd = (presentPageBlockStart + pageSize < this.totalPages)?presentPageBlockStart + pageSize:this.totalPages;
+    }
+
+
+
+
 }
+

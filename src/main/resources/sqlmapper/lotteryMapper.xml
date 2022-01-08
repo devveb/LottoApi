@@ -39,7 +39,7 @@
     </insert>
 
     <insert id="insertDreamResult" parameterType="DreamStory" useGeneratedKeys="true" keyProperty="idx" keyColumn="idx">
-        insert into lotto_suggestions(story,snid,isShow,targetDraw) VALUES (#{story},#{snid},#{iss},#{targetDraw})
+        insert into lotto_sug_test(story,snid,isShow,targetDraw) VALUES (#{story},#{snid},#{iss},#{targetDraw})
 
     </insert>
 
@@ -70,7 +70,7 @@
                 , date_format(regd, '%Y-%m-%d %H:%i') as regd
                 , TIMESTAMPDIFF(SECOND, regd, now())  as td
             from
-                lotto_suggestions sug
+                lotto_sug_test sug
             left outer join
                 lotto_suggestion_numset num
             on sug.snid = num.idx
@@ -143,7 +143,7 @@
                       , date_format(regd, '%Y-%m-%d %H:%i') as regd
                       , TIMESTAMPDIFF(SECOND, regd, now())  as td
                  from
-                     lotto_suggestions sug
+                     lotto_sug_test sug
                          left outer join
                      lotto_suggestion_numset num
                      on sug.snid = num.idx
@@ -285,7 +285,7 @@
     </select>
 
     <select id="getSuggestionById" parameterType="int" resultType="DreamStory">
-        select idx,story,snid,result,isShow as iss,regd as regDate from lotto_suggestions
+        select idx,story,snid,result,isShow as iss,regd as regDate from lotto_sug_test
         where idx = #{_parameter}
     </select>
 
@@ -295,7 +295,7 @@
     </select>
 
     <select id="getTargetDrawSuggestion" parameterType="int" resultType="DreamStory">
-        select snm.number_set as result, snm.idx as snid from lotto_suggestions sug
+        select snm.number_set as result, snm.idx as snid from lotto_sug_test sug
         left join lotto_suggestion_numset snm
         on sug.snid = snm.idx
         where sug.targetDraw = #{_parameter}
@@ -304,12 +304,12 @@
 
     <insert id="insertWeeklyDrawResult" parameterType="NumSet">
         insert into lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx});
-        update lotto_suggestions set result = #{place}, isCheck = 1 where snid = #{idx};
+        update lotto_sug_test set result = #{place}, isCheck = 1 where snid = #{idx};
     </insert>
 
     <select id="getUnIdentifiedEpis" parameterType="DrawInfo" resultType="DrawInfo">
     <![CDATA[
-        select distinct targetDraw as draw from lotto_suggestions where isCheck = 0 and targetDraw  <= #{draw}
+        select distinct targetDraw as draw from lotto_sug_test where isCheck = 0 and targetDraw  <= #{draw}
         ]]>
     </select>
 
@@ -339,10 +339,14 @@
             LTRIM(substr(story,1,25)) as story
             , date_format(regd, '%Y-%m-%d %H:%i') as regDate
         from
-            lotto_suggestions
+            lotto_sug_test
         where isShow = 1
         order by regd desc
-        limit #{currentPageNo},#{recordsPerPage}
+        limit #{startPage},#{recordsPerPage}
+    </select>
+
+    <select id="getTotalPage" resultType="int">
+        select count(*) from lotto_sug_test where isShow = 1
     </select>
 
 </mapper>

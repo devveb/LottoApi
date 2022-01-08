@@ -67,4 +67,6 @@ public interface LotteryMapper {
     void insertAutoReplyResult(NumSet ns);
 
     List<DreamStory> getList(Paging paging);
+
+    int getTotalPage();
 }
