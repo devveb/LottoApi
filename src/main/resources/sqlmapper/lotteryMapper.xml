@@ -336,8 +336,12 @@
 
     <select id="getList" resultType="DreamStory" parameterType="Paging">
         select
-            LTRIM(substr(story,1,25)) as story
-            , date_format(regd, '%Y-%m-%d %H:%i') as regDate
+            idx
+             ,snid
+             ,place
+             ,targetDraw
+            ,LTRIM(substr(story,1,25)) as story
+            ,date_format(regd, '%Y-%m-%d %H:%i') as regDate
         from
             lotto_sug_test
         where isShow = 1

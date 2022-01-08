@@ -30,9 +30,9 @@ public class Paging {
         this.pageSize = 10;
     }
 
-    public Paging(int currentPageNo){
+    public Paging(int currentPageNo,int recordsPerPage){
         this.currentPageNo = currentPageNo;
-        this.recordsPerPage = 30;
+        this.recordsPerPage = recordsPerPage;
         this.pageSize = 10;
         this.presentPageBlock = currentPageNo/pageSize;
         this.presentPageBlockStart = presentPageBlock * pageSize;
