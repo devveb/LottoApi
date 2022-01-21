@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 public class LotteryCron {
 
@@ -12,10 +15,13 @@ public class LotteryCron {
     LotteryService lotteryService;
 
 
-    @Scheduled(cron = "0 21 * * * *")
+    @Scheduled(cron = "30 5 12 * * *")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // 당첨번호 수집
+        Map m = new HashMap();
+        m.put("jobNo",1);
+        lotteryService.insertCronlog(m);
         lotteryService.getWeeklyWinningNumbers();
     }
 
@@ -27,9 +33,12 @@ public class LotteryCron {
 //        lotteryService.getWeeklyWinResult(0);
 //    }
 
-    @Scheduled(cron = "5 21 * * * *")
+    @Scheduled(cron = "50 10 12 * * *")
     private void getPastWeekWinResult(){
         // 이전 주 당첨 여부 업데이트
+        Map m = new HashMap();
+        m.put("jobNo",2);
+        lotteryService.insertCronlog(m);
         lotteryService.getPastWeeklyWinResult();
     }
 

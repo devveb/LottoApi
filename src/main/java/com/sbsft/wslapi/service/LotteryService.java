@@ -746,6 +746,10 @@ public class LotteryService {
             getWeeklyWinResult(draw.getDraw());
         }
     }
+
+    public void insertCronlog(Map m) {
+        lotteryMapper.insertCronlog(m);
+    }
 }
 
 

@@ -6,6 +6,7 @@ import com.sbsft.wslapi.model.NumSet;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface LotteryMapper {
@@ -64,4 +65,6 @@ public interface LotteryMapper {
     List<DrawInfo> getUnIdentifiedEpis(DrawInfo di);
 
     void insertAutoReplyResult(NumSet ns);
+
+    void insertCronlog(Map m);
 }

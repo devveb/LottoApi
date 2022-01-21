@@ -304,7 +304,7 @@
 
     <insert id="insertWeeklyDrawResult" parameterType="NumSet">
         insert into lotto_weekly_draw_history(draw, place, stake, snid) values (#{draw},#{place},#{prize},#{idx});
-        update lotto_suggestions set result = #{place}, isCheck = 1 where snid = #{idx};
+        update lotto_suggestions set place = #{place}, isCheck = 1,checkd = now() where snid = #{idx};
     </insert>
 
     <select id="getUnIdentifiedEpis" parameterType="DrawInfo" resultType="DrawInfo">
@@ -333,5 +333,9 @@
         where
               draw = #{draw}
     </select>
+
+    <insert id="insertCronlog" parameterType="map">
+        insert into lotto_cron_log(jobNo) values (#{jobNo});
+    </insert>
 
 </mapper>
