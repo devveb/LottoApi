@@ -6,8 +6,8 @@
 >
 <th:block layout:fragment="content">
     <form id="getContentForm" method="post" action="/content">
-        <input type="hidden" id="cid" name="cid">
-        <input type="hidden" id="pp" name="presentPage" th:value="${paging.currentPageNo}">
+        <input type="hidden" id="cid" name="idx">
+        <input type="hidden" id="pp" name="currentPageNo" th:value="${paging.currentPageNo}">
     </form>
 
     <div class="bs-docs-section">
@@ -57,22 +57,22 @@
                 <div>
                     <ul class="pagination pagination-sm" >
                         <li class="page-item">
-                            <a class="page-link" style="background-color: #2c3e50;"  th:href="@{/(page=1)}">처음</a>
+                            <a class="page-link" style="background-color: #2c3e50;"  th:href="@{/main(page=1)}">처음</a>
                         </li>
                         <li class="page-item">
-                            <a class="page-link" style="background-color: #2c3e50;" th:href="@{/(page=${paging.presentPageBlockStart-paging.pageSize})}" th:if="${paging.presentPageBlockEnd > paging.pageSize}">&laquo;</a>
+                            <a class="page-link" style="background-color: #2c3e50;" th:href="@{/main(p=${paging.presentPageBlockStart-paging.pageSize})}" th:if="${paging.presentPageBlockEnd > paging.pageSize}">&laquo;</a>
                         </li>
                         <th:block th:each="num : ${#numbers.sequence(paging.presentPageBlockStart,paging.presentPageBlockEnd)}">
 
                             <li class="page-item">
-                                <a class="page-link" style="background-color: #2c3e50;" th:href="@{/(page=${num})}" th:text="${num}" th:if="${num != 0}"></a>
+                                <a class="page-link" style="background-color: #2c3e50;" th:href="@{/main(p=${num})}" th:text="${num}" th:if="${num != 0}"></a>
                             </li>
                         </th:block>
                         <li class="page-item">
-                            <a class="page-link" style="background-color: #2c3e50;" th:if="${paging.presentPageBlockEnd < paging.totalPages}" th:href="@{/(page=${paging.presentPageBlockStart+paging.pageSize})}">&raquo;</a>
+                            <a class="page-link" style="background-color: #2c3e50;" th:if="${paging.presentPageBlockEnd < paging.totalPages}" th:href="@{/main(p=${paging.presentPageBlockStart+paging.pageSize})}">&raquo;</a>
                         </li>
                         <li class="page-item active">
-                            <a class="page-link" style="background-color: #2c3e50;" th:href="@{/(page=${paging.totalPages})}">마지막</a>
+                            <a class="page-link" style="background-color: #2c3e50;" th:href="@{/main(p=${paging.totalPages})}">마지막</a>
                         </li>
                     </ul>
                 </div>

@@ -254,7 +254,6 @@ a:hover {
 
 a:visited{
     color: #3b4242;
-    text-decoration: none;
 }
 
 /*a:not([class]), a:not([href]):not([class]):hover {*/

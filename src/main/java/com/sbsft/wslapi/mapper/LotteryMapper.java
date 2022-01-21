@@ -7,6 +7,7 @@ import com.sbsft.wslapi.model.Paging;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface LotteryMapper {
@@ -69,4 +70,8 @@ public interface LotteryMapper {
     List<DreamStory> getList(Paging paging);
 
     int getTotalPage();
+
+    List<Map<String, String>> getContentReply(Paging paging);
+
+    int getReplyCount(Paging paging);
 }

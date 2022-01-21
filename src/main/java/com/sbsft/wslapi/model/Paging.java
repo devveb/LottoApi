@@ -4,7 +4,7 @@ package com.sbsft.wslapi.model;
 import lombok.Data;
 
 @Data
-public class Paging {
+public class Paging extends DreamStory{
     /** 현재 페이지 번호 */
     private int currentPageNo;
 

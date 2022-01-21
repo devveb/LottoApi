@@ -229,6 +229,11 @@
         </if>
     </insert>
 
+    <select id="getContentReply" parameterType="Paging" resultType="DreamStory">
+        select idx,rep as story from lotto_story_reply_test where sid = #{idx}
+        limit #{startPage},#{recordsPerPage}
+    </select>
+
     <select id="getReplyById" parameterType="DreamStory" resultType="DreamStory">
         select
             idx
@@ -351,6 +356,10 @@
 
     <select id="getTotalPage" resultType="int">
         select count(*) from lotto_sug_test where isShow = 1
+    </select>
+
+    <select id="getReplyCount" parameterType="Paging" resultType="int">
+        select count(*) from lotto_story_reply where sid = #{idx}
     </select>
 
 </mapper>
