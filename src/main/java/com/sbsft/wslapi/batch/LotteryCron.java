@@ -15,7 +15,7 @@ public class LotteryCron {
     LotteryService lotteryService;
 
 
-    @Scheduled(cron = "30 5 12 * * *")
+    @Scheduled(cron = "30 5 12 * * sat")
 //    @Scheduled(cron = "0 * * * * mon")
     private void getWinningNumbers(){
         // 당첨번호 수집
@@ -33,7 +33,7 @@ public class LotteryCron {
 //        lotteryService.getWeeklyWinResult(0);
 //    }
 
-    @Scheduled(cron = "50 10 12 * * *")
+    @Scheduled(cron = "50 10 12 * * sat")
     private void getPastWeekWinResult(){
         // 이전 주 당첨 여부 업데이트
         Map m = new HashMap();
