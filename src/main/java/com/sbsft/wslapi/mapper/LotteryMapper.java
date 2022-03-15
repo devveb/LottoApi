@@ -6,6 +6,7 @@ import com.sbsft.wslapi.model.NumSet;
 import com.sbsft.wslapi.model.Paging;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,5 +74,7 @@ public interface LotteryMapper {
 
     List<Map<String, String>> getContentReply(Paging paging);
 
-    int getReplyCount(Paging paging);
+    int getReplyCount(HashMap param);
+
+    DreamStory getContent(HashMap param);
 }

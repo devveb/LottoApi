@@ -229,6 +229,10 @@
         </if>
     </insert>
 
+    <select id="getContent" parameterType="Map" resultType="DreamStory">
+        select * from lotto_sug_test where idx = #{idx}
+    </select>
+
     <select id="getContentReply" parameterType="Paging" resultType="DreamStory">
         select idx,rep as story from lotto_story_reply_test where sid = #{idx}
         limit #{startPage},#{recordsPerPage}
@@ -358,7 +362,7 @@
         select count(*) from lotto_sug_test where isShow = 1
     </select>
 
-    <select id="getReplyCount" parameterType="Paging" resultType="int">
+    <select id="getReplyCount" parameterType="Map" resultType="int">
         select count(*) from lotto_story_reply where sid = #{idx}
     </select>
 

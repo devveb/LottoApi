@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -31,35 +32,35 @@ public class LotteryFrontController {
     }
 
     @RequestMapping("/main")
-    String mainPage(Model model, @RequestParam("p") int page){
+    String mainPage(Model model, @RequestParam HashMap param){
 
         Paging paging = null;
+        int page = Integer.parseInt(param.get("p").toString());
+
         if(page == 0){
             paging = new Paging(1,30);
         }else{
             paging = new Paging(page,30);
         }
-        model.addAttribute("list",lotteryService.getList(model,paging));
+        lotteryService.getList(model,paging);
         model.addAttribute("paging",paging);
 
         return "views/index";
     }
 
-    @RequestMapping(value = "/content")
-    String contentPage(Model model,@ModelAttribute Paging p){
+    @PostMapping(value = "/content")
+    String contentPage(Model model,@RequestParam HashMap param){
 
-        Paging paging = new Paging(p.getCurrentPageNo(),15);
-        paging.setIdx(p.getIdx());
-
-        lotteryService.getContentReply(paging);
+        Paging paging = new Paging(Integer.parseInt(param.get("currentPageNo").toString()),30);
         lotteryService.getList(model,paging);
+        lotteryService.getContent(model,param);
 
         return "views/content";
     }
 
     @RequestMapping("/demo")
     String demoPage(Model model){
-        return "demo";
+        return "views/demo";
     }
 }
 

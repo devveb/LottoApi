@@ -762,11 +762,27 @@ public class LotteryService {
 
     }
 
-    public void getContentReply(Model model,Paging paging) {
-        int totalCnt = lotteryMapper.getReplyCount(paging);
+//    public void getContentReply(Model model,Paging paging) {
+//        int totalCnt = lotteryMapper.getReplyCount(paging);
+//        Paging repPaging = new Paging(1,10);
+//        repPaging.setTotalPages(totalCnt);
+//        List<Map<String,String>> replyList = lotteryMapper.getContentReply(paging);
+//        model.addAttribute("replyList",replyList);
+//        model.addAttribute("repPaging",repPaging);
+//    }
+
+    public void getContent(Model model, HashMap param) {
+
+
+        //Get content
+        DreamStory content = lotteryMapper.getContent(param);
+        model.addAttribute("content",content);
+
+        //Get pagination of replies
+        int totalCnt = lotteryMapper.getReplyCount(param);
         Paging repPaging = new Paging(1,10);
         repPaging.setTotalPages(totalCnt);
-        List<Map<String,String>> replyList = lotteryMapper.getContentReply(paging);
+        List<Map<String,String>> replyList = lotteryMapper.getContentReply(repPaging);
         model.addAttribute("replyList",replyList);
         model.addAttribute("repPaging",repPaging);
     }

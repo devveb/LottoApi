@@ -14,7 +14,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="page-header">
-                    <h6 id="tables">꿈게시판</h6>
+                    <h6 id="tables">꿈게시판index</h6>
                 </div>
 
                 <div class="bs-component">
@@ -29,7 +29,7 @@
                         </thead>
                         <tbody>
 
-                        <tr class="table-active" th:each="item : ${list}" th:if="${not #lists.isEmpty(list)}">
+                        <tr class="table-active" th:each="item : ${contentList}" th:if="${not #lists.isEmpty(contentList)}">
                             <td><a th:onclick="|javascript:contentDetail('${item.idx}')|" th:text="${item.story}"></a></td>
                             <td th:text="${item.targetDraw}"></td>
                             <td th:if="${item.place == 0}" th:text="추첨전"></td>
@@ -37,19 +37,19 @@
                             <td th:if="${item.place gt 5}" th:text="낙첨"></td>
                             <td th:text="${item.regDate}"></td>
                         </tr>
-                        <tr class="table-active" th:if="${#lists.isEmpty(list)}">
+                        <tr class="table-active" th:if="${#lists.isEmpty(contentList)}">
                             <td colspan="2" style="text-align: center;">No Data</td>
                         </tr>
 
                         </tbody>
                     </table>
-                </div><!-- /example -->
+                </div>
             </div>
         </div>
     </div>
 
-<!-- Navs
-================================================== -->
+
+<!--pagination -->
 <div class="bs-docs-section" style="padding-top: 5px;">
     <div class="row">
         <div class="col-lg-12">
@@ -57,7 +57,7 @@
                 <div>
                     <ul class="pagination pagination-sm" >
                         <li class="page-item">
-                            <a class="page-link" style="background-color: #2c3e50;"  th:href="@{/main(page=1)}">처음</a>
+                            <a class="page-link" style="background-color: #2c3e50;"  th:href="@{/main(p=1)}">처음</a>
                         </li>
                         <li class="page-item">
                             <a class="page-link" style="background-color: #2c3e50;" th:href="@{/main(p=${paging.presentPageBlockStart-paging.pageSize})}" th:if="${paging.presentPageBlockEnd > paging.pageSize}">&laquo;</a>
